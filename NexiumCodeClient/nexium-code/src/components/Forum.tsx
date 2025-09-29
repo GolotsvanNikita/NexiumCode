@@ -1,0 +1,1 @@
+export const Forum: React.FC = () => <h1>Forum Page</h1>;
