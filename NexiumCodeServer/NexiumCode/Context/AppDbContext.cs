@@ -21,6 +21,25 @@ namespace NexiumCode.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ForumThread>().HasQueryFilter(t => !t.IsDeleted);
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<ForumReply>()
+                .HasOne(fr => fr.Thread)
+                .WithMany(ft => ft.Replies)
+                .HasForeignKey(fr => fr.ThreadId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ForumReply>()
+                .HasOne(fr => fr.User)
+                .WithMany(u => u.ForumReplies)
+                .HasForeignKey(fr => fr.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ForumThread>()
+                .HasOne(ft => ft.User)
+                .WithMany(u => u.ForumThreads)
+                .HasForeignKey(ft => ft.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
