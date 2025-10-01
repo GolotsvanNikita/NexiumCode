@@ -6,9 +6,10 @@ interface NavbarProps
 {
     isAuthenticated: boolean;
     logout: () => void;
+    userId: number | null;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout }) =>
+export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout, userId }) =>
 {
     return (
         <nav>
@@ -29,7 +30,10 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout }) =>
             </div>
             <div className="nav-right">
                 {isAuthenticated ? (
-                    <button onClick={logout}>Logout</button>
+                    <>
+                        <Link to={`/profile/${userId}`}>Profile</Link>
+                        <button onClick={logout}>Logout</button>
+                    </>
                 ) : (
                     <>
                         <Link to="/login">Login</Link>
