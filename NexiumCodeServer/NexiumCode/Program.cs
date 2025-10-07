@@ -30,7 +30,6 @@ builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 
-// Настройка CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
@@ -42,11 +41,25 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.AddDebug();
+});
+
 var app = builder.Build();
 
 app.UseCors("AllowReact");
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:5173");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+    }
+});
 app.UseSession();
 app.UseAuthorization();
 app.MapControllers();
