@@ -25,4 +25,10 @@
     <Folder Include="certificates\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\СSharpCourse.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

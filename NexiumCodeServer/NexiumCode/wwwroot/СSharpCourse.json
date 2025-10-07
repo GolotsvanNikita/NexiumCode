@@ -1,0 +1,99 @@
+﻿{
+  "id": 1,
+  "name": "C# Basics",
+  "description": "Learn the fundamentals of C# programming, including syntax, variables, control structures, and object-oriented programming through theory and practical tasks.",
+  "lessons": [
+    {
+      "id": 1,
+      "title": "Introduction to C#",
+      "content": "C# is a modern, object-oriented programming language developed by Microsoft.\n\nKey points:\n- Used in .NET applications.\n- Strongly typed language.\n- Supports OOP principles like inheritance and polymorphism.",
+      "isTheory": true,
+      "order": 1,
+      "quizQuestions": [
+        {
+          "id": 1,
+          "questionText": "Who developed the C# programming language?",
+          "options": "A) Google\nB) Microsoft\nC) Oracle\nD) Apple",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 2,
+          "questionText": "What type of language is C#?",
+          "options": "A) Scripting\nB) Strongly typed\nC) Markup\nD) Query",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 3,
+          "questionText": "Which framework is C# primarily associated with?",
+          "options": "A) Django\nB) .NET\nC) Spring\nD) Ruby on Rails",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Variables and Data Types",
+      "content": "C# supports various data types like int, double, string, and bool.\n\nExample:\n```csharp\nint age = 25;\nstring name = \"Alice\";\nbool isStudent = true;\n```",
+      "isTheory": true,
+      "order": 2,
+      "quizQuestions": [
+        {
+          "id": 4,
+          "questionText": "Which data type is used to store whole numbers in C#?",
+          "options": "A) string\nB) int\nC) double\nD) bool",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 5,
+          "questionText": "What is the default value of a bool variable in C#?",
+          "options": "A) true\nB) false\nC) null\nD) 0",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Control Structures",
+      "content": "Control structures like if, for, and while manage the flow of a C# program.\n\nExample:\n```csharp\nif (age > 18) {\n  Console.WriteLine(\"Adult\");\n} else {\n  Console.WriteLine(\"Minor\");\n}\n```",
+      "isTheory": true,
+      "order": 3,
+      "quizQuestions": [
+        {
+          "id": 6,
+          "questionText": "Which keyword is used for a conditional statement in C#?",
+          "options": "A) switch\nB) if\nC) for\nD) while",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 7,
+          "questionText": "What does the 'break' keyword do in a loop?",
+          "options": "A) Pauses the loop\nB) Exits the loop\nC) Skips one iteration\nD) Restarts the loop",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Practice: Basic Programs",
+      "content": null,
+      "isTheory": false,
+      "order": 4,
+      "practiceTasks": [
+        {
+          "id": 1,
+          "taskDescription": "Write a program to print 'Hello, World!' to the console.",
+          "starterCode": "using System;\n\nclass Program {\n  static void Main() {\n    // Your code here\n  }\n}",
+          "testCases": "Expected Output: Hello, World!",
+          "averageTimeSeconds": 300
+        },
+        {
+          "id": 2,
+          "taskDescription": "Write a program to calculate the sum of two numbers provided as input.",
+          "starterCode": "using System;\n\nclass Program {\n  static void Main() {\n    int a = 5;\n    int b = 10;\n    // Your code here\n  }\n}",
+          "testCases": "Input: a = 5, b = 10\nExpected Output: 15",
+          "averageTimeSeconds": 360
+        }
+      ]
+    }
+  ]
+}
