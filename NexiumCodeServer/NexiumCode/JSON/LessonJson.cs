@@ -12,5 +12,6 @@ namespace NexiumCode.JSON
         public int Order { get; set; }
         public List<QuizQuestionJson> QuizQuestions { get; set; }
         public List<PracticeTaskJson> PracticeTasks { get; set; }
+        public string StarterCode { get; set; }
     }
 }

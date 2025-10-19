@@ -22,11 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="certificates\" />
+    <Folder Include="wwwroot\certificates\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\СSharpCourse.json">
+    <Content Update="wwwroot\%D0%A1SharpCourse.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

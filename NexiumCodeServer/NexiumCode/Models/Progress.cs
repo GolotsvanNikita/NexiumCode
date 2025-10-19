@@ -21,5 +21,6 @@ namespace NexiumCode.Models
         public User User { get; set; }
 
         public Course Course { get; set; }
+        public ICollection<ProgressLesson> ProgressLessons { get; set; } = [];
     }
 }

@@ -27,6 +27,7 @@ builder.Services.AddScoped<IPracticeTaskRepository, PracticeTaskRepository>();
 builder.Services.AddScoped<IForumThreadRepository, ForumThreadRepository>();
 builder.Services.AddScoped<IForumReplyRepository, ForumReplyRepository>();
 builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
+builder.Services.AddScoped<IQuizQuestionRepository, QuizQuestionRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connection));
 

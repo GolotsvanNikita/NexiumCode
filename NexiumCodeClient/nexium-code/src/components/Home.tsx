@@ -2,7 +2,13 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import './Home.css';
 
-export const Home: React.FC = () =>
+interface HomeProps
+{
+    isAuthenticated: boolean;
+    userId: number | null;
+}
+
+export const Home: React.FC<HomeProps> = ({ isAuthenticated, userId }) =>
 {
     const fadeInVariants =
     {
@@ -24,10 +30,22 @@ export const Home: React.FC = () =>
                 // @ts-ignore
                 variants={fadeInVariants}
             >
+                <motion.div
+                    className="logo-container"
+                    // @ts-ignore
+                    variants={fadeInVariants}
+                >
+                    <img
+                        src="http://localhost:5064/logo.png"
+                        alt="NexiumCode Logo"
+                        className="hero-logo"
+                    />
+                </motion.div>
+
                 <motion.h1
                     // @ts-ignore
                     variants={fadeInVariants}
-                    whileHover={{ scale: 1.05, color: '#ffffff' }}
+                    whileHover={{ scale: 1.05 }}
                 >
                     Welcome to NexiumCode!
                 </motion.h1>
@@ -38,15 +56,28 @@ export const Home: React.FC = () =>
                 >
                     Learn programming with practice problems, quizzes, and an active forum. Get started now!
                 </motion.p>
-                <motion.div
-                    className="cta-buttons"
-                    // @ts-ignore
-                    variants={fadeInVariants}
-                    transition={{ delay: 0.4 }}
-                >
-                    <Link to="/register" className="cta-button">Register</Link>
-                    <Link to="/login" className="cta-button">Login</Link>
-                </motion.div>
+
+                {!isAuthenticated ? (
+                    <motion.div
+                        className="cta-buttons"
+                        // @ts-ignore
+                        variants={fadeInVariants}
+                        transition={{ delay: 0.4 }}
+                    >
+                        <Link to="/register" className="cta-button">Register</Link>
+                        <Link to="/login" className="cta-button">Login</Link>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        className="cta-buttons"
+                        // @ts-ignore
+                        variants={fadeInVariants}
+                        transition={{ delay: 0.4 }}
+                    >
+                        <Link to="/courses/1" className="cta-button primary">Start Learning</Link>
+                        <Link to={`/profile/${userId}`} className="cta-button secondary">My Profile</Link>
+                    </motion.div>
+                )}
             </motion.section>
 
             <motion.section
@@ -60,9 +91,11 @@ export const Home: React.FC = () =>
                 <h2>Popular Courses</h2>
                 <div className="courses-list">
                     <motion.div className="course-card" variants={hoverVariants} whileHover="hover">
-                        <h3>Course 1: C# Basics</h3>
+                        <h3>C# Basics</h3>
                         <p>Learn the fundamentals of C# programming, including syntax, variables, and control structures.</p>
-                        <Link to="/courses/1">Go</Link>
+                        <Link to={isAuthenticated ? "/courses/1" : "/login"}>
+                            {isAuthenticated ? "Continue Learning" : "Get Started"}
+                        </Link>
                     </motion.div>
                 </div>
             </motion.section>
@@ -77,7 +110,9 @@ export const Home: React.FC = () =>
             >
                 <h2>Community Forum</h2>
                 <p>Discuss questions, share experiences, and find solutions with other students.</p>
-                <Link to="/forum" className="cta-button">Go to the Forum</Link>
+                <Link to={isAuthenticated ? "/forum" : "/login"} className="cta-button">
+                    Go to the Forum
+                </Link>
             </motion.section>
 
             <footer className="footer">

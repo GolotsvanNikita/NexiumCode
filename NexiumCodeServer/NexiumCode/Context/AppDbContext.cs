@@ -8,6 +8,7 @@ namespace NexiumCode.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Progress> Progresses { get; set; }
+        public DbSet<ProgressLesson> ProgressLessons { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<ForumThread> ForumThreads { get; set; }
         public DbSet<ForumReply> ForumReplies { get; set; }
@@ -40,6 +41,14 @@ namespace NexiumCode.Context
                 .WithMany(u => u.ForumThreads)
                 .HasForeignKey(ft => ft.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ProgressLesson>()
+            .HasKey(pl => pl.Id);
+
+            modelBuilder.Entity<ProgressLesson>()
+                .HasOne(pl => pl.Progress)
+                .WithMany(p => p.ProgressLessons)
+                .HasForeignKey(pl => pl.ProgressId);
         }
     }
 }
