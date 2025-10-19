@@ -9,5 +9,6 @@ namespace NexiumCode.Repositories
         Task UpdateTheoryProgress(int userId, int courseId, int progress);
 
         Task UpdatePracticeProgress(int userId, int courseId, int progress);
+        Task UpdateLessonProgress(int userId, int courseId, int lessonId, int progress);
     }
 }

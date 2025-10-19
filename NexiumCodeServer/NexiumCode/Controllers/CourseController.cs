@@ -15,21 +15,29 @@ namespace NexiumCode.Controllers
     [Route("api/[controller]")]
     public class CourseController : ControllerBase
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         private readonly ICourseRepository _courseRepository;
         private readonly ILessonRepository _lessonRepository;
         private readonly IProgressRepository _progressRepository;
         private readonly ILogger<CourseController> _logger;
+        private readonly IWebHostEnvironment _env;
 
         public CourseController(
             ICourseRepository courseRepository,
             ILessonRepository lessonRepository,
             IProgressRepository progressRepository,
-            ILogger<CourseController> logger)
+            ILogger<CourseController> logger,
+            IWebHostEnvironment env)
         {
             _courseRepository = courseRepository;
             _lessonRepository = lessonRepository;
             _progressRepository = progressRepository;
             _logger = logger;
+            _env = env;
         }
 
         [HttpGet("{courseId}")]
@@ -37,9 +45,7 @@ namespace NexiumCode.Controllers
         {
             if (courseId == 1)
             {
-                var currentDir = Directory.GetCurrentDirectory();
-                var jsonPath = Path.Combine(currentDir, "wwwroot", "CSharpCourse.json");
-                _logger.LogInformation($"Current directory: {currentDir}");
+                var jsonPath = Path.Combine(_env.WebRootPath, "CSharpCourse.json");
                 _logger.LogInformation($"Checking file at: {jsonPath}");
 
                 if (!System.IO.File.Exists(jsonPath))
@@ -52,7 +58,9 @@ namespace NexiumCode.Controllers
                 {
                     var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
                     _logger.LogInformation("Successfully read JSON file.");
-                    var course = JsonSerializer.Deserialize<object>(jsonString);
+
+                    // Добавить JsonOptions
+                    var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
 
                     var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
                     var theoryProgress = progress?.TheoryProgress ?? 0;
@@ -66,171 +74,87 @@ namespace NexiumCode.Controllers
                 }
                 catch (JsonException ex)
                 {
-                    _logger.LogError($"JSON deserialization failed: {ex.Message}");
+                    _logger.LogError("Deserialization failed: {ex.Message}", ex);
                     return StatusCode(500, new { Message = "Error deserializing course data." });
                 }
             }
 
-            var dbCourse = await _courseRepository.GetCourseWithLessons(courseId);
-            if (dbCourse == null)
-            {
-                _logger.LogWarning($"Course with ID {courseId} not found in database.");
-                return NotFound(new { Message = "Course not found." });
-            }
-
-            var progressDb = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
-            var theoryProgressDb = progressDb?.TheoryProgress ?? 0;
-
-            var lessons = await _lessonRepository.GetLessonsByCourse(courseId);
-            var response = new
-            {
-                dbCourse.Id,
-                dbCourse.Name,
-                dbCourse.Description,
-                TheoryProgress = theoryProgressDb,
-                IsPracticeUnlocked = theoryProgressDb == 100,
-                Lessons = lessons.Select(l => new
-                {
-                    l.Id,
-                    l.Title,
-                    l.IsTheory,
-                    l.Order,
-                    IsAccessible = l.IsTheory || theoryProgressDb == 100
-                }).OrderBy(l => l.Order)
-            };
-
-            return Ok(response);
+            return NotFound();
         }
 
         [HttpGet("{courseId}/lesson/{lessonId}")]
         public async Task<IActionResult> GetLesson(int courseId, int lessonId, [FromQuery] int userId)
         {
-            if (courseId == 1)
-            {
-                var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CSharpCourse.json");
-                _logger.LogInformation($"Checking file at: {jsonPath}");
+            _logger.LogInformation($"GetLesson called: courseId={courseId}, lessonId={lessonId}, userId={userId}");
 
-                if (!System.IO.File.Exists(jsonPath))
+            var jsonPath = Path.Combine(_env.WebRootPath, "CSharpCourse.json");
+            _logger.LogInformation($"Checking file at: {jsonPath}");
+
+            if (!System.IO.File.Exists(jsonPath))
+            {
+                _logger.LogError("Course JSON file not found.");
+                return NotFound(new { Message = "Course JSON not found. Path checked: " + jsonPath });
+            }
+
+            try
+            {
+                var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
+                _logger.LogInformation($"JSON file read, length: {jsonString.Length}");
+
+                // Добавить JsonOptions
+                var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
+
+                if (course == null)
                 {
-                    _logger.LogError("JSON not found.");
-                    return NotFound(new { Message = "JSON not found." });
+                    _logger.LogError("Course deserialization returned null");
+                    return StatusCode(500, new { Message = "Failed to deserialize course data." });
                 }
 
-                try
+                if (course.Lessons == null || !course.Lessons.Any())
                 {
-                    var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
-                    var course = JsonSerializer.Deserialize<CourseJson>(jsonString);
-                    var lesson = course.Lessons.FirstOrDefault(l => l.Id == lessonId);
-
-                    if (lesson == null || lesson.CourseId != courseId)
-                    {
-                        _logger.LogWarning($"Lesson with ID {lessonId} not found for course {courseId}.");
-                        return NotFound(new { Message = "Lesson not found." });
-                    }
-
-                    var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
-                    var theoryProgress = progress?.TheoryProgress ?? 0;
-
-                    if (!lesson.IsTheory && theoryProgress < 100)
-                    {
-                        return StatusCode(403, new { Message = "Practice is locked until theory is 100% complete." });
-                    }
-
-                    return Ok(new
-                    {
-                        lesson.Id,
-                        lesson.Title,
-                        lesson.Content,
-                        lesson.IsTheory,
-                        lesson.Order,
-                        QuizQuestions = lesson.IsTheory ? lesson.QuizQuestions?.Select(q => new
-                        {
-                            q.Id,
-                            q.QuestionText,
-                            q.Options
-                        }) : null,
-                        PracticeTasks = !lesson.IsTheory ? lesson.PracticeTasks?.Select(t => new
-                        {
-                            t.Id,
-                            t.TaskDescription,
-                            t.StarterCode,
-                            t.TestCases,
-                            t.AverageTimeSeconds
-                        }) : null
-                    });
+                    _logger.LogError("Course.Lessons is null or empty");
+                    return StatusCode(500, new { Message = "Course has no lessons." });
                 }
-                catch (JsonException ex)
+
+                _logger.LogInformation($"Course deserialized, lessons count: {course.Lessons.Count}");
+
+                var lesson = course.Lessons.FirstOrDefault(l => l.Id == lessonId);
+                if (lesson == null)
                 {
-                    _logger.LogError($"JSON deserialization failed: {ex.Message}");
-                    return StatusCode(500, new { Message = "Error deserializing lesson data." });
+                    _logger.LogWarning($"Lesson with ID {lessonId} not found for course {courseId}.");
+                    return NotFound(new { Message = "Lesson not found." });
                 }
-            }
 
-            var dbLesson = await _lessonRepository.GetLessonWithDetails(lessonId);
-            if (dbLesson == null || dbLesson.CourseId != courseId)
-            {
-                _logger.LogWarning($"Lesson with ID {lessonId} not found for course {courseId}.");
-                return NotFound(new { Message = "Lesson not found." });
-            }
+                _logger.LogInformation($"Lesson found: {lesson.Title}");
 
-            var progressDb = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
-            var theoryProgressDb = progressDb?.TheoryProgress ?? 0;
+                var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
+                var theoryProgress = progress?.TheoryProgress ?? 0;
 
-            if (!dbLesson.IsTheory && theoryProgressDb < 100)
-            {
-                return StatusCode(403, new { Message = "Practice is locked until theory is 100% complete." });
-            }
-
-            var response = new
-            {
-                dbLesson.Id,
-                dbLesson.Title,
-                dbLesson.Content,
-                dbLesson.IsTheory,
-                dbLesson.Order,
-                QuizQuestions = dbLesson.IsTheory ? dbLesson.QuizQuestions?.Select(q => new
+                return Ok(new
                 {
-                    q.Id,
-                    q.QuestionText,
-                    q.Options
-                }) : null,
-                PracticeTasks = !dbLesson.IsTheory ? dbLesson.PracticeTasks?.Select(t => new
-                {
-                    t.Id,
-                    t.TaskDescription,
-                    t.StarterCode,
-                    t.TestCases,
-                    t.AverageTimeSeconds
-                }) : null
-            };
-
-            return Ok(response);
-        }
-
-        [HttpPost("{courseId}/progress/theory")]
-        public async Task<IActionResult> UpdateTheoryProgress(int courseId, [FromBody] UpdateProgressDTO request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
+                    lesson.Id,
+                    lesson.Title,
+                    lesson.Content,
+                    lesson.IsTheory,
+                    lesson.Order,
+                    lesson.StarterCode,
+                    QuizQuestions = lesson.QuizQuestions?.Select(q => new { q.Id, q.QuestionText, q.Options, q.CorrectAnswer, q.Explanation }),
+                    TheoryProgress = theoryProgress,
+                    IsPracticeUnlocked = theoryProgress == 100
+                });
             }
-
-            var user = await _progressRepository.GetById(request.UserId);
-            if (user == null)
+            catch (JsonException ex)
             {
-                return NotFound(new { Message = "User not found." });
+                _logger.LogError($"Deserialization failed: {ex.Message}");
+                _logger.LogError($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { Message = "Error deserializing lesson data.", Details = ex.Message });
             }
-
-            var course = await _courseRepository.GetById(courseId);
-            if (course == null && courseId != 1)
+            catch (Exception ex)
             {
-                return NotFound(new { Message = "Course not found." });
+                _logger.LogError($"Unexpected error: {ex.Message}");
+                _logger.LogError($"Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { Message = "Unexpected error.", Details = ex.Message });
             }
-
-            await _progressRepository.UpdateTheoryProgress(request.UserId, courseId, request.Progress);
-            await _progressRepository.SaveChanges();
-
-            return Ok(new { Message = "Theory progress updated." });
         }
     }
 }

@@ -6,8 +6,10 @@ import { Navbar } from './components/Navbar.tsx';
 import { type JSX, useState } from 'react';
 import { Login } from './components/Login.tsx';
 import { Register } from './components/Register.tsx';
-import { Courses } from './components/Courses.tsx';
+import { Course } from './components/Course.tsx';
 import { Forum } from './components/Forum.tsx';
+import { Lesson } from "./components/Lesson.tsx";
+import { Profile } from "./components/Profile.tsx";
 
 const App: React.FC = () =>
 {
@@ -35,18 +37,40 @@ const App: React.FC = () =>
         <>
             <Navbar isAuthenticated={isAuthenticated} logout={logout} userId={userId} />
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home isAuthenticated={isAuthenticated} userId={userId} />} />
                 <Route path="/login" element={<Login login={login} />} />
                 <Route path="/register" element={<Register login={login} />} />
+
                 <Route
                     path="/courses/:courseId"
                     element=
                     {
                         <PrivateRoute>
-                            <Courses userId={userId} />
+                            <Course userId={userId} />
                         </PrivateRoute>
                     }
                 />
+
+                <Route
+                    path="/courses/:courseId/theory"
+                    element=
+                    {
+                        <PrivateRoute>
+                            <Lesson userId={userId} />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/:userId"
+                    element=
+                    {
+                        <PrivateRoute>
+                            <Profile userId={userId} />
+                        </PrivateRoute>
+                    }
+                />
+
                 <Route path="/forum" element={<PrivateRoute><Forum /></PrivateRoute>} />
             </Routes>
         </>

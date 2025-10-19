@@ -14,10 +14,20 @@ namespace NexiumCode.Controllers
     public class QuizQuestionController : ControllerBase
     {
         private readonly IQuizQuestionRepository _quizQuestionRepository;
+        private readonly ILogger<QuizQuestionController> _logger;
 
-        public QuizQuestionController(IQuizQuestionRepository quizQuestionRepository)
+        // Добавить опции для десериализации
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        public QuizQuestionController(
+            IQuizQuestionRepository quizQuestionRepository,
+            ILogger<QuizQuestionController> logger)
         {
             _quizQuestionRepository = quizQuestionRepository;
+            _logger = logger;
         }
 
         [HttpGet("{lessonId}")]
@@ -42,37 +52,92 @@ namespace NexiumCode.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (questionId >= 1 && questionId <= 7)
+            try
             {
-                var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CSharpCourse.json");
-                if (!System.IO.File.Exists(jsonPath))
+                if (questionId >= 1 && questionId <= 7)
                 {
-                    return NotFound(new { Message = "Course JSON not found." });
+                    var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CSharpCourse.json");
+                    _logger.LogInformation($"Looking for JSON at: {jsonPath}");
+
+                    if (!System.IO.File.Exists(jsonPath))
+                    {
+                        _logger.LogError("Course JSON file not found.");
+                        return NotFound(new { Message = "Course JSON not found." });
+                    }
+
+                    var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
+                    _logger.LogInformation($"JSON file read, length: {jsonString.Length}");
+
+                    // ВАЖНО: Добавить JsonOptions
+                    var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
+
+                    // Добавить проверки на null
+                    if (course == null)
+                    {
+                        _logger.LogError("Course deserialization returned null");
+                        return StatusCode(500, new { Message = "Failed to deserialize course data." });
+                    }
+
+                    if (course.Lessons == null)
+                    {
+                        _logger.LogError("Course.Lessons is null");
+                        return StatusCode(500, new { Message = "Course has no lessons." });
+                    }
+
+                    _logger.LogInformation($"Course deserialized, lessons count: {course.Lessons.Count}");
+
+                    // Безопасный поиск с проверкой на null
+                    QuizQuestionJson question = null;
+                    foreach (var lesson in course.Lessons)
+                    {
+                        if (lesson.QuizQuestions != null)
+                        {
+                            question = lesson.QuizQuestions.FirstOrDefault(q => q.Id == questionId);
+                            if (question != null)
+                            {
+                                _logger.LogInformation($"Found question in lesson: {lesson.Title}");
+                                break;
+                            }
+                        }
+                    }
+
+                    if (question == null)
+                    {
+                        _logger.LogWarning($"Question with ID {questionId} not found");
+                        return NotFound(new { Message = "Quiz question not found." });
+                    }
+
+                    bool isCorrect = request.Answer?.Equals(question.CorrectAnswer, StringComparison.OrdinalIgnoreCase) ?? false;
+                    _logger.LogInformation($"Answer check: submitted={request.Answer}, correct={question.CorrectAnswer}, isCorrect={isCorrect}");
+
+                    return Ok(new
+                    {
+                        IsCorrect = isCorrect,
+                        CorrectAnswer = isCorrect ? null : question.CorrectAnswer,
+                        Explanation = isCorrect ? null : question.Explanation
+                    });
                 }
 
-                var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
-                var course = JsonSerializer.Deserialize<CourseJson>(jsonString);
-                var question = course.Lessons
-                    .SelectMany(l => l.QuizQuestions ?? new List<QuizQuestionJson>())
-                    .FirstOrDefault(q => q.Id == questionId);
-
-                if (question == null)
+                // Для вопросов из БД
+                var dbQuestion = await _quizQuestionRepository.GetById(questionId);
+                if (dbQuestion == null)
                 {
                     return NotFound(new { Message = "Quiz question not found." });
                 }
 
-                bool isCorrect = request.Answer == question.CorrectAnswer;
-                return Ok(new { IsCorrect = isCorrect, CorrectAnswer = isCorrect ? null : question.CorrectAnswer });
+                bool isCorrectDb = request.Answer == dbQuestion.CorrectAnswer;
+                return Ok(new { IsCorrect = isCorrectDb, CorrectAnswer = isCorrectDb ? null : dbQuestion.CorrectAnswer });
             }
-
-            var dbQuestion = await _quizQuestionRepository.GetById(questionId);
-            if (dbQuestion == null)
+            catch (JsonException ex)
             {
-                return NotFound(new { Message = "Quiz question not found." });
+                _logger.LogError(ex, "JSON deserialization error");
+                return StatusCode(500, new { Message = "Error deserializing course data.", Details = ex.Message });
             }
-
-            bool isCorrectDb = request.Answer == dbQuestion.CorrectAnswer;
-            return Ok(new { IsCorrect = isCorrectDb, CorrectAnswer = isCorrectDb ? null : dbQuestion.CorrectAnswer });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error submitting quiz answer");
+                return StatusCode(500, new { Message = "Error processing answer.", Details = ex.Message });
+            }
         }
     }
 }
