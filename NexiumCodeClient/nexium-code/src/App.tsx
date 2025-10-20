@@ -8,9 +8,11 @@ import { Login } from './components/Login.tsx';
 import { Register } from './components/Register.tsx';
 import { Course } from './components/Course.tsx';
 import { Forum } from './components/Forum.tsx';
+import { ForumThread } from './components/ForumThread.tsx';
 import { Lesson } from "./components/Lesson.tsx";
 import { Profile } from "./components/Profile.tsx";
 import {CustomCursor} from "./cursor/CustomCursor.tsx";
+import { CreateTopic } from "./components/CreateTopic.tsx";
 
 const App: React.FC = () =>
 {
@@ -73,7 +75,32 @@ const App: React.FC = () =>
                     }
                 />
 
-                <Route path="/forum" element={<PrivateRoute><Forum /></PrivateRoute>} />
+                <Route
+                        path="/forum"
+                        element={
+                            <PrivateRoute>
+                            <Forum />
+                            </PrivateRoute>
+                        }
+                        />
+
+                        <Route
+                        path="/forum/:id"
+                        element={
+                            <PrivateRoute>
+                            <ForumThread />
+                            </PrivateRoute>
+                        }
+                        />
+                        
+                            <Route
+                            path="/forum/create"
+                            element={
+                                <PrivateRoute>
+                                <CreateTopic />
+                                </PrivateRoute>
+                            }
+                            />
             </Routes>
         </>
     );

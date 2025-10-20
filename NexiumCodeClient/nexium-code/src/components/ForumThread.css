@@ -1,0 +1,292 @@
+/* =========================
+   Forum Thread Styles (NexiumCode)
+   ========================= */
+
+.thread-container {
+  max-width: 800px;
+  margin: 60px auto;
+  background: #f7f5f1;
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #e3dfd7;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* ---------- Кнопка назад ---------- */
+.back-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Заголовок темы ---------- */
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e3dfd7;
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.topic-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.topic-category {
+  font-size: 0.9rem;
+  color: #666;
+  padding: 4px 10px;
+  background: #eae6df;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* ---------- Статусы ---------- */
+.topic-status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.topic-status.open {
+  background: #dff7e1;
+  color: #147c37;
+  border: 1px solid #bde4c5;
+}
+
+.topic-status.closed {
+  background: #fdeaea;
+  color: #a12727;
+  border: 1px solid #f5b5b5;
+}
+
+/* ---------- Комментарии ---------- */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.new-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e3dfd7;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ddd;
+  border: 2px solid #e3dfd7;
+}
+
+.input-wrapper {
+  flex: 1;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 12px;
+  border: 1px solid #e3dfd7;
+  border-radius: 10px;
+  resize: none;
+  font-size: 0.95rem;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comment-textarea:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.1);
+  outline: none;
+}
+
+.comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.comment-button {
+  background: #111;
+  color: #f5f2ec;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.comment-button:hover {
+  background: #2a2a2a;
+  transform: translateY(-1px);
+}
+
+/* ---------- Карточка комментария ---------- */
+.comment {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-card {
+  background: #ffffff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #e3dfd7;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comment-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ddd;
+  border: 2px solid #e3dfd7;
+  object-fit: cover;
+}
+
+.comment-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #111;
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.comment-text {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  color: #444;
+  line-height: 1.5;
+}
+
+.reply-button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.reply-button:hover {
+  text-decoration: underline;
+}
+
+.reply-box {
+  margin-top: 10px;
+  margin-left: 50px;
+}
+
+.reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cancel-button {
+  background: none;
+  border: none;
+  color: #777;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  text-decoration: underline;
+}
+
+.replies {
+  margin-left: 50px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-text pre {
+  background: #1e1e1e;
+  color: #f8f8f2;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-family: "Fira Code", monospace;
+  font-size: 14px;
+}
+
+.comment-text code {
+  font-family: "Fira Code", monospace;
+}
+
+
+
+
+@media (max-width: 768px) {
+  .thread-container {
+    padding: 20px;
+  }
+
+  .topic-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .new-comment {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .avatar {
+    margin-bottom: 10px;
+  }
+
+  .reply-box,
+  .replies {
+    margin-left: 0;
+  }
+}
