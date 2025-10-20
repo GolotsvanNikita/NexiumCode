@@ -6,9 +6,15 @@
     {
       "id": 1,
       "title": "Introduction to C#",
-      "content": "C# is a modern, object-oriented programming language developed by Microsoft.\n\nKey points:\n- Used in .NET applications.\n- Strongly typed language.\n- Supports OOP principles like inheritance and polymorphism.",
+      "content": "C# is a modern, object-oriented programming language developed by Microsoft in 2000.\n\nKey features:\n- Part of the .NET ecosystem\n- Strongly typed language (type safety)\n- Supports Object-Oriented Programming (OOP)\n- Cross-platform with .NET Core\n- Used for web apps, desktop apps, games (Unity), and mobile apps\n\nC# combines the power of C++ with the simplicity of Visual Basic, making it perfect for beginners and professionals alike.",
       "isTheory": true,
       "order": 1,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Your first C# program\nusing System;\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(\"Hello, World!\");\n        Console.WriteLine(\"Welcome to C# programming!\");\n    }\n}"
+        }
+      ],
       "quizQuestions": [
         {
           "id": 1,
@@ -19,7 +25,7 @@
         {
           "id": 2,
           "questionText": "What type of language is C#?",
-          "options": "A) Scripting\nB) Strongly typed\nC) Markup\nD) Query",
+          "options": "A) Scripting language\nB) Strongly typed language\nC) Markup language\nD) Query language",
           "correctAnswer": "B"
         },
         {
@@ -33,9 +39,19 @@
     {
       "id": 2,
       "title": "Variables and Data Types",
-      "content": "C# supports various data types like int, double, string, and bool.\n\nExample:\n```csharp\nint age = 25;\nstring name = \"Alice\";\nbool isStudent = true;\n```",
+      "content": "Variables store data in your programs. C# is strongly typed, meaning every variable must have a specific type.\n\nPrimitive Data Types:\n- int: whole numbers (-2,147,483,648 to 2,147,483,647)\n- double: decimal numbers (15-16 digits precision)\n- float: decimal numbers (6-7 digits precision)\n- string: text in double quotes\n- char: single character in single quotes\n- bool: true or false\n\nVariables must be declared before use. Use meaningful names in camelCase.",
       "isTheory": true,
       "order": 2,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Declaring and initializing variables\nint age = 25;\ndouble price = 19.99;\nfloat temperature = 36.6f;\nstring name = \"Alice\";\nchar grade = 'A';\nbool isStudent = true;\n\n// Output\nConsole.WriteLine($\"Name: {name}\");\nConsole.WriteLine($\"Age: {age}\");\nConsole.WriteLine($\"Is student: {isStudent}\");"
+        },
+        {
+          "language": "csharp",
+          "code": "// Type conversion\nint number = 10;\ndouble result = number; // Implicit conversion\n\ndouble pi = 3.14;\nint roundedPi = (int)pi; // Explicit conversion (casting)\n\nConsole.WriteLine(roundedPi); // Output: 3"
+        }
+      ],
       "quizQuestions": [
         {
           "id": 4,
@@ -48,50 +64,291 @@
           "questionText": "What is the default value of a bool variable in C#?",
           "options": "A) true\nB) false\nC) null\nD) 0",
           "correctAnswer": "B"
+        },
+        {
+          "id": 6,
+          "questionText": "Which symbol is used for string interpolation in C#?",
+          "options": "A) #\nB) @\nC) $\nD) %",
+          "correctAnswer": "C"
         }
       ]
     },
     {
       "id": 3,
-      "title": "Control Structures",
-      "content": "Control structures like if, for, and while manage the flow of a C# program.\n\nExample:\n```csharp\nif (age > 18) {\n  Console.WriteLine(\"Adult\");\n} else {\n  Console.WriteLine(\"Minor\");\n}\n```",
+      "title": "Operators and Expressions",
+      "content": "Operators perform operations on variables and values.\n\nArithmetic Operators:\n+ (addition), - (subtraction), * (multiplication), / (division), % (modulus)\n\nComparison Operators:\n== (equal), != (not equal), > (greater), < (less), >= (greater or equal), <= (less or equal)\n\nLogical Operators:\n&& (AND), || (OR), ! (NOT)\n\nAssignment Operators:\n= (assign), += (add and assign), -=, *=, /=, ++, --",
       "isTheory": true,
       "order": 3,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Arithmetic operators\nint a = 10;\nint b = 3;\n\nConsole.WriteLine(a + b);  // 13\nConsole.WriteLine(a - b);  // 7\nConsole.WriteLine(a * b);  // 30\nConsole.WriteLine(a / b);  // 3 (integer division)\nConsole.WriteLine(a % b);  // 1 (remainder)"
+        },
+        {
+          "language": "csharp",
+          "code": "// Comparison and logical operators\nint age = 20;\nbool hasLicense = true;\n\nbool canDrive = (age >= 18) && hasLicense;\nConsole.WriteLine($\"Can drive: {canDrive}\"); // true\n\nbool isTeenOrAdult = (age >= 13) || (age >= 18);\nConsole.WriteLine($\"Teen or Adult: {isTeenOrAdult}\"); // true"
+        }
+      ],
       "quizQuestions": [
         {
-          "id": 6,
-          "questionText": "Which keyword is used for a conditional statement in C#?",
-          "options": "A) switch\nB) if\nC) for\nD) while",
+          "id": 7,
+          "questionText": "What is the result of 10 % 3 in C#?",
+          "options": "A) 3\nB) 1\nC) 0\nD) 10",
           "correctAnswer": "B"
         },
         {
-          "id": 7,
-          "questionText": "What does the 'break' keyword do in a loop?",
-          "options": "A) Pauses the loop\nB) Exits the loop\nC) Skips one iteration\nD) Restarts the loop",
+          "id": 8,
+          "questionText": "Which operator checks if two values are NOT equal?",
+          "options": "A) ==\nB) =\nC) !=\nD) <>",
+          "correctAnswer": "C"
+        },
+        {
+          "id": 9,
+          "questionText": "What does the ++ operator do?",
+          "options": "A) Decrements by 1\nB) Increments by 1\nC) Multiplies by 2\nD) Divides by 2",
           "correctAnswer": "B"
         }
       ]
     },
     {
       "id": 4,
-      "title": "Practice: Basic Programs",
-      "content": null,
-      "isTheory": false,
+      "title": "Control Structures: If-Else",
+      "content": "Control structures allow your program to make decisions and execute different code based on conditions.\n\nThe if statement executes code only if a condition is true.\nThe else statement provides an alternative when the condition is false.\nThe else if allows checking multiple conditions sequentially.",
+      "isTheory": true,
       "order": 4,
-      "practiceTasks": [
+      "codeExamples": [
         {
-          "id": 1,
-          "taskDescription": "Write a program to print 'Hello, World!' to the console.",
-          "starterCode": "using System;\n\nclass Program {\n  static void Main() {\n    // Your code here\n  }\n}",
-          "testCases": "Expected Output: Hello, World!",
-          "averageTimeSeconds": 300
+          "language": "csharp",
+          "code": "// Simple if-else\nint age = 20;\n\nif (age >= 18)\n{\n    Console.WriteLine(\"You are an adult\");\n}\nelse\n{\n    Console.WriteLine(\"You are a minor\");\n}"
         },
         {
-          "id": 2,
-          "taskDescription": "Write a program to calculate the sum of two numbers provided as input.",
-          "starterCode": "using System;\n\nclass Program {\n  static void Main() {\n    int a = 5;\n    int b = 10;\n    // Your code here\n  }\n}",
-          "testCases": "Input: a = 5, b = 10\nExpected Output: 15",
-          "averageTimeSeconds": 360
+          "language": "csharp",
+          "code": "// Multiple conditions with else if\nint score = 85;\n\nif (score >= 90)\n{\n    Console.WriteLine(\"Grade: A\");\n}\nelse if (score >= 80)\n{\n    Console.WriteLine(\"Grade: B\");\n}\nelse if (score >= 70)\n{\n    Console.WriteLine(\"Grade: C\");\n}\nelse\n{\n    Console.WriteLine(\"Grade: F\");\n}"
+        },
+        {
+          "language": "csharp",
+          "code": "// Nested if statements\nint temperature = 25;\nbool isSunny = true;\n\nif (temperature > 20)\n{\n    if (isSunny)\n    {\n        Console.WriteLine(\"Perfect day for a picnic!\");\n    }\n    else\n    {\n        Console.WriteLine(\"Warm but cloudy\");\n    }\n}"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 10,
+          "questionText": "Which keyword is used for a conditional statement in C#?",
+          "options": "A) switch\nB) if\nC) for\nD) while",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 11,
+          "questionText": "What happens if an if condition is false and there's no else statement?",
+          "options": "A) Program crashes\nB) Nothing happens, code continues\nC) Error is thrown\nD) Program exits",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 12,
+          "questionText": "Can you have multiple else if statements?",
+          "options": "A) No, only one\nB) Yes, unlimited\nC) Yes, maximum 5\nD) No, use switch instead",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Loops: For and While",
+      "content": "Loops allow you to repeat code multiple times without writing it repeatedly.\n\nfor loop: Use when you know how many times to repeat.\nwhile loop: Use when you repeat based on a condition.\ndo-while loop: Like while, but executes at least once.\n\nLoop control:\n- break: exits the loop immediately\n- continue: skips current iteration",
+      "isTheory": true,
+      "order": 5,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// For loop\nfor (int i = 0; i < 5; i++)\n{\n    Console.WriteLine($\"Count: {i}\");\n}\n// Output: 0, 1, 2, 3, 4"
+        },
+        {
+          "language": "csharp",
+          "code": "// While loop\nint number = 1;\n\nwhile (number <= 5)\n{\n    Console.WriteLine($\"Number: {number}\");\n    number++;\n}"
+        },
+        {
+          "language": "csharp",
+          "code": "// Break and continue\nfor (int i = 0; i < 10; i++)\n{\n    if (i == 3)\n    {\n        continue; // Skip 3\n    }\n    if (i == 7)\n    {\n        break; // Stop at 7\n    }\n    Console.WriteLine(i);\n}\n// Output: 0, 1, 2, 4, 5, 6"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 13,
+          "questionText": "What does the 'break' keyword do in a loop?",
+          "options": "A) Pauses the loop\nB) Exits the loop\nC) Skips one iteration\nD) Restarts the loop",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 14,
+          "questionText": "Which loop always executes at least once?",
+          "options": "A) for\nB) while\nC) do-while\nD) foreach",
+          "correctAnswer": "C"
+        },
+        {
+          "id": 15,
+          "questionText": "What does 'continue' do in a loop?",
+          "options": "A) Exits the loop\nB) Restarts from beginning\nC) Skips to next iteration\nD) Pauses execution",
+          "correctAnswer": "C"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Arrays",
+      "content": "Arrays store multiple values of the same type in a single variable.\n\nKey points:\n- Fixed size (cannot change after creation)\n- Zero-indexed (first element is at index 0)\n- Access elements using square brackets []\n- Use .Length property to get size\n\nArrays are useful when you need to store collections of related data.",
+      "isTheory": true,
+      "order": 6,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Declaring and initializing arrays\nint[] numbers = new int[5]; // Array of 5 integers\nstring[] names = { \"Alice\", \"Bob\", \"Charlie\" };\n\n// Accessing elements\nConsole.WriteLine(names[0]); // Alice\nConsole.WriteLine(names[2]); // Charlie\n\n// Array length\nConsole.WriteLine($\"Array has {names.Length} elements\");"
+        },
+        {
+          "language": "csharp",
+          "code": "// Looping through arrays\nint[] scores = { 85, 92, 78, 95, 88 };\n\n// Using for loop\nfor (int i = 0; i < scores.Length; i++)\n{\n    Console.WriteLine($\"Score {i + 1}: {scores[i]}\");\n}\n\n// Using foreach loop\nforeach (int score in scores)\n{\n    Console.WriteLine(score);\n}"
+        },
+        {
+          "language": "csharp",
+          "code": "// Modifying array elements\nint[] numbers = { 10, 20, 30, 40, 50 };\n\nnumbers[0] = 100; // Change first element\nnumbers[2] = 300; // Change third element\n\nConsole.WriteLine(numbers[0]); // 100\nConsole.WriteLine(numbers[2]); // 300"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 16,
+          "questionText": "What is the index of the first element in an array?",
+          "options": "A) 1\nB) 0\nC) -1\nD) Depends on array size",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 17,
+          "questionText": "How do you get the number of elements in an array?",
+          "options": "A) array.Size\nB) array.Count\nC) array.Length\nD) array.Elements",
+          "correctAnswer": "C"
+        },
+        {
+          "id": 18,
+          "questionText": "Can you change the size of an array after creation?",
+          "options": "A) Yes, using Resize()\nB) Yes, using Add()\nC) No, arrays are fixed size\nD) Yes, automatically",
+          "correctAnswer": "C"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Methods (Functions)",
+      "content": "Methods are reusable blocks of code that perform specific tasks. They help organize code and avoid repetition.\n\nMethod components:\n- Return type: what the method returns (void if nothing)\n- Name: descriptive name in PascalCase\n- Parameters: input values (optional)\n- Body: code to execute\n\nBenefits:\n- Code reusability\n- Better organization\n- Easier testing and debugging",
+      "isTheory": true,
+      "order": 7,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Method without parameters or return value\nvoid SayHello()\n{\n    Console.WriteLine(\"Hello, World!\");\n}\n\n// Calling the method\nSayHello(); // Output: Hello, World!"
+        },
+        {
+          "language": "csharp",
+          "code": "// Method with parameters\nvoid Greet(string name)\n{\n    Console.WriteLine($\"Hello, {name}!\");\n}\n\nGreet(\"Alice\"); // Hello, Alice!\nGreet(\"Bob\");   // Hello, Bob!"
+        },
+        {
+          "language": "csharp",
+          "code": "// Method with return value\nint Add(int a, int b)\n{\n    return a + b;\n}\n\nint result = Add(5, 3);\nConsole.WriteLine(result); // 8\n\n// Using directly\nConsole.WriteLine(Add(10, 20)); // 30"
+        },
+        {
+          "language": "csharp",
+          "code": "// Method with multiple parameters and logic\ndouble CalculateAverage(int[] numbers)\n{\n    int sum = 0;\n    foreach (int num in numbers)\n    {\n        sum += num;\n    }\n    return (double)sum / numbers.Length;\n}\n\nint[] scores = { 85, 90, 78, 92 };\ndouble avg = CalculateAverage(scores);\nConsole.WriteLine($\"Average: {avg}\");"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 19,
+          "questionText": "What keyword is used for a method that doesn't return a value?",
+          "options": "A) null\nB) empty\nC) void\nD) none",
+          "correctAnswer": "C"
+        },
+        {
+          "id": 20,
+          "questionText": "What does the 'return' keyword do?",
+          "options": "A) Exits the program\nB) Returns a value and exits the method\nC) Prints a value\nD) Declares a variable",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 21,
+          "questionText": "Can a method have multiple parameters?",
+          "options": "A) No, only one\nB) Yes, unlimited\nC) Yes, maximum 5\nD) No parameters allowed",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Introduction to Classes and Objects",
+      "content": "Object-Oriented Programming (OOP) is a programming paradigm based on objects.\n\nClass: A blueprint for creating objects (like a template).\nObject: An instance of a class (actual thing created from template).\n\nClass contains:\n- Fields: variables that store data\n- Properties: controlled access to fields\n- Methods: functions that define behavior\n\nOOP Principles:\n- Encapsulation: bundling data and methods\n- Abstraction: hiding complexity\n- Inheritance: reusing code from parent classes\n- Polymorphism: objects taking many forms",
+      "isTheory": true,
+      "order": 8,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Defining a class\nclass Person\n{\n    // Fields\n    public string Name;\n    public int Age;\n    \n    // Method\n    public void Introduce()\n    {\n        Console.WriteLine($\"Hi, I'm {Name} and I'm {Age} years old.\");\n    }\n}"
+        },
+        {
+          "language": "csharp",
+          "code": "// Creating and using objects\nclass Program\n{\n    static void Main()\n    {\n        // Creating objects\n        Person person1 = new Person();\n        person1.Name = \"Alice\";\n        person1.Age = 25;\n        \n        Person person2 = new Person();\n        person2.Name = \"Bob\";\n        person2.Age = 30;\n        \n        // Using methods\n        person1.Introduce();\n        person2.Introduce();\n    }\n}"
+        },
+        {
+          "language": "csharp",
+          "code": "// Class with constructor\nclass Car\n{\n    public string Brand;\n    public string Model;\n    public int Year;\n    \n    // Constructor\n    public Car(string brand, string model, int year)\n    {\n        Brand = brand;\n        Model = model;\n        Year = year;\n    }\n    \n    public void DisplayInfo()\n    {\n        Console.WriteLine($\"{Year} {Brand} {Model}\");\n    }\n}\n\n// Usage\nCar myCar = new Car(\"Toyota\", \"Camry\", 2023);\nmyCar.DisplayInfo(); // 2023 Toyota Camry"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 22,
+          "questionText": "What is a class in C#?",
+          "options": "A) A variable\nB) A blueprint for creating objects\nC) A loop structure\nD) A data type",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 23,
+          "questionText": "What is an object?",
+          "options": "A) A class definition\nB) An instance of a class\nC) A method\nD) A variable",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 24,
+          "questionText": "What is a constructor used for?",
+          "options": "A) To destroy objects\nB) To initialize objects\nC) To create methods\nD) To define classes",
+          "correctAnswer": "B"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Course Summary and Next Steps",
+      "content": "Congratulations! You've completed C# Basics! 🎉\n\nWhat you've learned:\n✓ C# syntax and structure\n✓ Variables and data types\n✓ Operators and expressions\n✓ Control structures (if-else, loops)\n✓ Arrays for storing collections\n✓ Methods for code reusability\n✓ Object-oriented programming basics\n\nNext steps:\n1. Practice with coding challenges\n2. Build small projects (calculator, to-do list)\n3. Learn advanced OOP concepts\n4. Explore .NET framework\n5. Study LINQ and collections\n6. Learn about file handling and databases\n\nKeep coding and never stop learning! 🚀",
+      "isTheory": true,
+      "order": 9,
+      "codeExamples": [
+        {
+          "language": "csharp",
+          "code": "// Complete example combining all concepts\nusing System;\n\nclass Student\n{\n    public string Name;\n    public int[] Grades;\n    \n    public Student(string name, int[] grades)\n    {\n        Name = name;\n        Grades = grades;\n    }\n    \n    public double CalculateAverage()\n    {\n        int sum = 0;\n        foreach (int grade in Grades)\n        {\n            sum += grade;\n        }\n        return (double)sum / Grades.Length;\n    }\n    \n    public void DisplayReport()\n    {\n        double avg = CalculateAverage();\n        Console.WriteLine($\"Student: {Name}\");\n        Console.WriteLine($\"Average: {avg:F2}\");\n        \n        if (avg >= 90)\n        {\n            Console.WriteLine(\"Grade: A - Excellent!\");\n        }\n        else if (avg >= 80)\n        {\n            Console.WriteLine(\"Grade: B - Great job!\");\n        }\n        else if (avg >= 70)\n        {\n            Console.WriteLine(\"Grade: C - Good work!\");\n        }\n        else\n        {\n            Console.WriteLine(\"Grade: F - Keep trying!\");\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        int[] aliceGrades = { 95, 88, 92, 85 };\n        Student alice = new Student(\"Alice\", aliceGrades);\n        alice.DisplayReport();\n    }\n}"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "id": 25,
+          "questionText": "Which of these is NOT a primitive data type in C#?",
+          "options": "A) int\nB) string\nC) array\nD) bool",
+          "correctAnswer": "C"
+        },
+        {
+          "id": 26,
+          "questionText": "What is the main benefit of using methods?",
+          "options": "A) Faster execution\nB) Code reusability\nC) More memory\nD) Better graphics",
+          "correctAnswer": "B"
+        },
+        {
+          "id": 27,
+          "questionText": "What does OOP stand for?",
+          "options": "A) Object Oriented Programming\nB) Only One Program\nC) Out Of Process\nD) Open Output Port",
+          "correctAnswer": "A"
         }
       ]
     }
