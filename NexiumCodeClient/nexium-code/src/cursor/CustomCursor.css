@@ -1,0 +1,60 @@
+* {
+    cursor: none !important;
+}
+
+.custom-cursor
+{
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+}
+
+.custom-cursor.hovering
+{
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+.cursor-outer
+{
+    transition: r 0.2s ease, stroke-width 0.2s ease;
+}
+
+.cursor-middle
+{
+    transition: r 0.2s ease;
+}
+
+.cursor-center
+{
+    transition: r 0.2s ease;
+}
+
+.custom-cursor.hovering .cursor-outer
+{
+    r: 12%;
+    stroke-width: 3;
+}
+
+.custom-cursor.hovering .cursor-center
+{
+    r: 3.5%;
+}
+
+@keyframes cursorFadeIn
+{
+    from
+    {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    to
+    {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.custom-cursor {
+    animation: cursorFadeIn 0.2s ease-out;
+}

@@ -36,7 +36,7 @@ export const Home: React.FC<HomeProps> = ({ isAuthenticated, userId }) =>
                     variants={fadeInVariants}
                 >
                     <img
-                        src="http://localhost:5064/logo.png"
+                        src="http://localhost:5064/images/logo.png"
                         alt="NexiumCode Logo"
                         className="hero-logo"
                     />

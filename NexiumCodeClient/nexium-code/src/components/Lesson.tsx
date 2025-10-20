@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './Lesson.css';
 
 interface QuizQuestion
@@ -19,8 +21,15 @@ interface Lesson
     content: string | null;
     isTheory: boolean;
     order: number;
+    codeExamples?: CodeExample[];
     starterCode?: string;
     quizQuestions?: QuizQuestion[];
+}
+
+interface CodeExample
+{
+    language: string;
+    code: string;
 }
 
 interface Course
@@ -66,7 +75,7 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
                 setLoading(true);
                 setError(null);
 
-                const response = await axios.get(`http://localhost:5064/CSharpCourse.json`);
+                const response = await axios.get(`http://localhost:5064/CSharpCourse.json?t=${Date.now()}`);
                 console.log('Course data received:', response.data);
 
                 if (!response.data)
@@ -297,10 +306,27 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
                             {selectedLesson.content}
                         </div>
 
-                        {selectedLesson.starterCode && (
-                            <pre className="code-block">
-                                <code>{selectedLesson.starterCode}</code>
-                            </pre>
+                        {selectedLesson.codeExamples && selectedLesson.codeExamples.length > 0 && (
+                            <div className="code-examples-section">
+                                {selectedLesson.codeExamples.map((example, index) => (
+                                    <div key={index} className="code-example-wrapper">
+                                        <div className="code-header">
+                                            <span className="code-language">{example.language}</span>
+                                        </div>
+                                        <SyntaxHighlighter
+                                            language={example.language}
+                                            style={vscDarkPlus}
+                                            customStyle={{
+                                                margin: 0,
+                                                borderRadius: '0 0 12px 12px',
+                                                padding: '24px'
+                                            }}
+                                        >
+                                            {example.code}
+                                        </SyntaxHighlighter>
+                                    </div>
+                                ))}
+                            </div>
                         )}
 
                         {selectedLesson.quizQuestions && selectedLesson.quizQuestions.length > 0 && (
