@@ -16,7 +16,6 @@ namespace NexiumCode.Controllers
         private readonly IQuizQuestionRepository _quizQuestionRepository;
         private readonly ILogger<QuizQuestionController> _logger;
 
-        // Добавить опции для десериализации
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -68,10 +67,8 @@ namespace NexiumCode.Controllers
                     var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
                     _logger.LogInformation($"JSON file read, length: {jsonString.Length}");
 
-                    // ВАЖНО: Добавить JsonOptions
                     var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
 
-                    // Добавить проверки на null
                     if (course == null)
                     {
                         _logger.LogError("Course deserialization returned null");
@@ -86,7 +83,6 @@ namespace NexiumCode.Controllers
 
                     _logger.LogInformation($"Course deserialized, lessons count: {course.Lessons.Count}");
 
-                    // Безопасный поиск с проверкой на null
                     QuizQuestionJson question = null;
                     foreach (var lesson in course.Lessons)
                     {
@@ -118,7 +114,6 @@ namespace NexiumCode.Controllers
                     });
                 }
 
-                // Для вопросов из БД
                 var dbQuestion = await _quizQuestionRepository.GetById(questionId);
                 if (dbQuestion == null)
                 {

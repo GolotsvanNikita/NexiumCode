@@ -76,7 +76,9 @@ namespace NexiumCode.Controllers
         public async Task<IActionResult> CreateThread([FromBody] CreateThreadDTO request)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }    
 
             var thread = new ForumThread
             {
