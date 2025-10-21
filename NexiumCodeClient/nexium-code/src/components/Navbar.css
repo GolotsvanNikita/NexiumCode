@@ -117,7 +117,6 @@ nav > a:hover
 .nav-right a:hover
 {
     background: #ffffff;
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(232, 227, 219, 0.4);
 }
 
@@ -140,7 +139,6 @@ nav > a:hover
     background: rgba(211, 47, 47, 0.1);
     border-color: #d32f2f;
     color: #ff6b6b;
-    transform: translateY(-2px);
 }
 
 .dropdown

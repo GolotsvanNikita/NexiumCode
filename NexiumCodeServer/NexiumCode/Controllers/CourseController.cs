@@ -59,7 +59,6 @@ namespace NexiumCode.Controllers
                     var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
                     _logger.LogInformation("Successfully read JSON file.");
 
-                    // Добавить JsonOptions
                     var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
 
                     var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
@@ -101,7 +100,6 @@ namespace NexiumCode.Controllers
                 var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
                 _logger.LogInformation($"JSON file read, length: {jsonString.Length}");
 
-                // Добавить JsonOptions
                 var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
 
                 if (course == null)

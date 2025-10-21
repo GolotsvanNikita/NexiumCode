@@ -19,10 +19,19 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout, userId 
                     <Dropdown.Toggle className="dropdown-toggle">Courses</Dropdown.Toggle>
                     <Dropdown.Menu className="dropdown-menu">
                         <Dropdown.Item as={Link} to={isAuthenticated ? '/courses/1' : '/login'} className="dropdown-item">
-                            Course 1
+                            <div className="course-item">
+                                <img
+                                    src="http://localhost:5064/images/C_sharp.png"
+                                    alt="C#"
+                                    className="course-icon"
+                                />
+                                <span>C# Basics</span>
+                            </div>
                         </Dropdown.Item>
                         <Dropdown.Item as={Link} to={isAuthenticated ? '/courses/2' : '/login'} className="dropdown-item">
-                            Course 2
+                            <div className="course-item">
+                                <span>Course 2</span>
+                            </div>
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

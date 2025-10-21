@@ -10,7 +10,7 @@ interface QuizQuestion
     id: number;
     questionText: string;
     options: string;
-    correctAnswer?: string;
+    correctAnswer: string;
     explanation?: string;
 }
 
@@ -148,32 +148,23 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
 
         for (const question of selectedLesson.quizQuestions)
         {
-            try
-            {
-                const response = await axios.post(`/api/QuizQuestion/${question.id}/submit`,
-                {
-                    answer: quizAnswers[question.id]
-                });
+            const userAnswer = quizAnswers[question.id];
+            const isCorrect = userAnswer === question.correctAnswer;
 
-                results[question.id] =
-                {
-                    questionId: question.id,
-                    isCorrect: response.data.isCorrect,
-                    correctAnswer: response.data.correctAnswer,
-                    explanation: response.data.explanation
-                };
+            results[question.id] = {
+                questionId: question.id,
+                isCorrect: isCorrect,
+                correctAnswer: question.correctAnswer || '',
+                explanation: question.explanation
+            };
 
-                if (response.data.isCorrect) correctCount++;
-            }
-            catch (err)
-            {
-                console.error('Error submitting answer:', err);
-            }
+            if (isCorrect) correctCount++;
         }
 
         setQuizResults(results);
         const score = (correctCount / selectedLesson.quizQuestions.length) * 100;
         console.log('Quiz score:', score);
+        console.log('Correct answers:', correctCount, 'out of', selectedLesson.quizQuestions.length);
 
         if (score >= 70 && !lessonProgress[selectedLesson.id])
         {
@@ -197,10 +188,10 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
             try
             {
                 await axios.post(`/api/Progress/${courseId}/theory`,
-                {
-                    userId,
-                    progress: newTheoryProgress,
-                });
+                    {
+                        userId,
+                        progress: newTheoryProgress,
+                    });
                 console.log('Progress updated on server successfully');
             }
             catch (err: any)
@@ -241,16 +232,6 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
         return <div className="error">No theory lessons found</div>;
     }
 
-    console.log('Rendering - Total theory lessons:', theoryLessons.length);
-    console.log('Lesson progress:', lessonProgress);
-    console.log('All lessons completed:', allLessonsCompleted);
-
-    console.log('course:', course);
-    console.log('theoryLessons:', theoryLessons);
-    console.log('theoryLessons type:', Array.isArray(theoryLessons));
-    console.log('theoryLessons length:', theoryLessons?.length);
-    console.log('selectedLesson:', selectedLesson);
-
     return (
         <div className="lesson-page">
             <aside className="lesson-sidebar">
@@ -276,24 +257,16 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
                 </div>
 
                 <div className="lessons-nav">
-                    {theoryLessons.map((lesson, index) =>
-                    {
-                        console.log('Rendering lesson item:', index, lesson);
-                        return (
-                            <div
-                                key={lesson.id}
-                                onClick={() =>
-                                {
-                                    console.log('Clicked lesson:', lesson.id);
-                                    selectLesson(lesson);
-                                }}
-                                className='lesson-nav-item'
-                            >
-                                <div>Lesson {index + 1}: {lesson.title}</div>
-                                {lessonProgress[lesson.id] && <div>COMPLETED</div>}
-                            </div>
-                        );
-                    })}
+                    {theoryLessons.map((lesson, index) => (
+                        <div
+                            key={lesson.id}
+                            onClick={() => selectLesson(lesson)}
+                            className='lesson-nav-item'
+                        >
+                            <div>Lesson {index + 1}: {lesson.title}</div>
+                            {lessonProgress[lesson.id] && <div>COMPLETED</div>}
+                        </div>
+                    ))}
                 </div>
             </aside>
 
@@ -370,19 +343,13 @@ export const Lesson: React.FC<LessonProps> = ({ userId }) =>
                                             ))}
                                         </div>
 
-                                        {showResults && quizResults[question.id] && (
-                                            <div className={`result-message ${quizResults[question.id].isCorrect ? 'correct-msg' : 'incorrect-msg'}`}>
-                                                {quizResults[question.id].isCorrect ? (
-                                                    <p>Correct!</p>
-                                                ) : (
-                                                    <>
-                                                        <p>Incorrect. Correct answer: {quizResults[question.id].correctAnswer}</p>
-                                                        {quizResults[question.id].explanation && (
-                                                            <p className="explanation">
-                                                                <strong>Explanation:</strong> {quizResults[question.id].explanation}
-                                                            </p>
-                                                        )}
-                                                    </>
+                                        {showResults && quizResults[question.id] && !quizResults[question.id].isCorrect && (
+                                            <div className="result-message incorrect-msg">
+                                                <p>Incorrect. Correct answer: {quizResults[question.id].correctAnswer}</p>
+                                                {quizResults[question.id].explanation && (
+                                                    <p className="explanation">
+                                                        <strong>Explanation:</strong> {quizResults[question.id].explanation}
+                                                    </p>
                                                 )}
                                             </div>
                                         )}

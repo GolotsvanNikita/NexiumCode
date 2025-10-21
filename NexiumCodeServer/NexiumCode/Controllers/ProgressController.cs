@@ -31,7 +31,6 @@ namespace NexiumCode.Controllers
                 {
                     _logger.LogInformation($"No progress found for user {userId} and course {courseId}, returning default values");
 
-                    // Return default progress instead of 404
                     return Ok(new
                     {
                         UserId = userId,
