@@ -15,10 +15,16 @@ namespace NexiumCode.Models
 
         public string Content { get; set; }
 
+        public int? ParentReplyId { get; set; }
+
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         public ForumThread Thread { get; set; }
 
         public User User { get; set; }
+
+        public ForumReply ParentReply { get; set; }
+
+        public ICollection<ForumReply> ChildReplies { get; set; }
     }
 }

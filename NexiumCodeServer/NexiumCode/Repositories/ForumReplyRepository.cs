@@ -13,6 +13,9 @@ namespace NexiumCode.Repositories
             return await _context.ForumReplies
                 .Where(r => r.ThreadId == threadId)
                 .Include(r => r.User)
+                .Include(r => r.ChildReplies)
+                    .ThenInclude(c => c.User)
+                .OrderBy(r => r.CreatedAt)
                 .ToListAsync();
         }
     }

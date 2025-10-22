@@ -1,7 +1,6 @@
-
 .create-topic-container {
   max-width: 800px;
-  margin: 40px auto;
+  margin: 80px auto 40px;
   background: #f7f5f1;
   border: 1px solid #e3dfd7;
   border-radius: 16px;
@@ -10,16 +9,39 @@
   font-family: "Inter", system-ui, sans-serif;
 }
 
-.backButtonDiv{
-    margin-top: 20px;
-
+.backButtonDiv {
+  margin-top: 20px;
 }
-.back-button{
-    border: 1px solid black;
-    border-radius: 20px;
-    padding: 7px;
-    color: #e0e0e0;
-    background-color: black;
+
+.back-button {
+  border: 1px solid black;
+  border-radius: 20px;
+  padding: 7px 15px;
+  color: #e0e0e0;
+  background-color: black;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: #2a2a2a;
+}
+
+.create-topic-container h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111;
+  margin: 20px 0;
+}
+
+.error-message {
+  margin: 12px 0;
+  padding: 12px;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 10px;
+  color: #d32f2f;
+  font-weight: 500;
 }
 
 .topic-input,
@@ -33,6 +55,7 @@
   background: #fff;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 .topic-input:focus,
@@ -43,6 +66,18 @@
   box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.1);
 }
 
+.topic-input:disabled,
+.topic-select:disabled,
+.topic-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.topic-textarea {
+  min-height: 200px;
+  resize: vertical;
+  font-family: "Inter", system-ui, sans-serif;
+}
 
 .editor-toolbar {
   display: flex;
@@ -57,12 +92,17 @@
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
+  font-weight: 500;
 }
 
-.editor-toolbar button:hover {
+.editor-toolbar button:hover:not(:disabled) {
   background: #e0e0e0;
 }
 
+.editor-toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .topic-preview {
   background: #f9f8f5;
@@ -72,8 +112,8 @@
   border: 1px solid #e3dfd7;
   font-size: 0.95rem;
   line-height: 1.5;
+  min-height: 200px;
 }
-
 
 .publish-button {
   margin-top: 20px;
@@ -85,13 +125,19 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.25s ease;
+  font-size: 1rem;
 }
 
-.publish-button:hover {
+.publish-button:hover:not(:disabled) {
   background: #2a2a2a;
   transform: translateY(-1px);
 }
 
+.publish-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
 
 @media (max-width: 768px) {
   .create-topic-container {

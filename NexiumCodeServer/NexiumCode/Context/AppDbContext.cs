@@ -19,6 +19,7 @@ namespace NexiumCode.Context
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ForumThread>().HasQueryFilter(t => !t.IsDeleted);
@@ -42,8 +43,14 @@ namespace NexiumCode.Context
                 .HasForeignKey(ft => ft.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<ForumReply>()
+                .HasOne(r => r.ParentReply)
+                .WithMany(r => r.ChildReplies)
+                .HasForeignKey(r => r.ParentReplyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<ProgressLesson>()
-            .HasKey(pl => pl.Id);
+                .HasKey(pl => pl.Id);
 
             modelBuilder.Entity<ProgressLesson>()
                 .HasOne(pl => pl.Progress)

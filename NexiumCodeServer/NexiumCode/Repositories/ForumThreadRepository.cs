@@ -12,15 +12,21 @@ namespace NexiumCode.Repositories
         {
             return await _context.ForumThreads
                 .Include(t => t.Replies)
+                    .ThenInclude(r => r.User)
                 .Include(t => t.User)
                 .Where(t => !t.IsDeleted)
+                .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
 
-        public async Task<ForumThread> GetThreadWithReplies(int threadId) 
+        public async Task<ForumThread> GetThreadWithReplies(int threadId)
         {
             return await _context.ForumThreads
                 .Include(t => t.Replies)
+                    .ThenInclude(r => r.User)
+                .Include(t => t.Replies)
+                    .ThenInclude(r => r.ChildReplies)
+                        .ThenInclude(c => c.User)
                 .Include(t => t.User)
                 .Where(t => t.Id == threadId && !t.IsDeleted)
                 .FirstOrDefaultAsync();
@@ -32,7 +38,6 @@ namespace NexiumCode.Repositories
             if (thread != null && !thread.IsDeleted)
             {
                 thread.IsResolved = true;
-                thread.CreatedAt = DateTimeOffset.UtcNow;
                 await Update(thread);
             }
         }
@@ -43,7 +48,6 @@ namespace NexiumCode.Repositories
             if (thread != null)
             {
                 thread.IsDeleted = true;
-                thread.CreatedAt = DateTimeOffset.UtcNow;
                 await Update(thread);
             }
         }

@@ -18,6 +18,8 @@ namespace NexiumCode.Models
 
         public int Rating { get; set; } = 0;
 
+        public string AvatarUrl { get; set; } = "/images/avatars/default-avatar.png";
+
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         public ICollection<Progress> Progresses { get; set; }

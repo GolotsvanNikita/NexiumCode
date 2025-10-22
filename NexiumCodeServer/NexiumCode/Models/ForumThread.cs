@@ -14,6 +14,9 @@ namespace NexiumCode.Models
 
         public string Content { get; set; }
 
+        [Required]
+        public string Category { get; set; } = "JavaScript";
+
         public bool IsResolved { get; set; } = false;
 
         public bool IsDeleted { get; set; } = false;

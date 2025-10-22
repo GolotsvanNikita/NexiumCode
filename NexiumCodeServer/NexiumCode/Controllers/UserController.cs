@@ -5,6 +5,7 @@ using NexiumCode.DTO;
 using NexiumCode.Models;
 using NexiumCode.Repositories;
 using NexiumCode.Services;
+using System.Linq;
 
 namespace NexiumCode.Controllers
 {
@@ -13,12 +14,18 @@ namespace NexiumCode.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICertificateRepository _certificateRepository;
         private readonly IPasswordHash _hasher;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserRepository userRepository, IPasswordHash hasher, ILogger<UserController> logger)
+        public UserController(
+            IUserRepository userRepository,
+            ICertificateRepository certificateRepository,
+            IPasswordHash hasher,
+            ILogger<UserController> logger)
         {
             _userRepository = userRepository;
+            _certificateRepository = certificateRepository;
             _hasher = hasher;
             _logger = logger;
         }
@@ -46,6 +53,7 @@ namespace NexiumCode.Controllers
                 {
                     Username = request.Username,
                     Email = request.Email,
+                    AvatarUrl = "/images/avatars/default-avatar.png",
                     CreatedAt = DateTimeOffset.UtcNow
                 };
 
@@ -85,7 +93,7 @@ namespace NexiumCode.Controllers
 
                 HttpContext.Session.SetInt32("UserId", user.Id);
                 _logger.LogInformation("User logged in: {UserId}", user.Id);
-                return Ok(new { UserId = user.Id, Username = user.Username });
+                return Ok(new { UserId = user.Id, Username = user.Username, AvatarUrl = user.AvatarUrl });
             }
             catch (Exception ex)
             {
@@ -94,32 +102,64 @@ namespace NexiumCode.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            try
+            {
+                var user = await _userRepository.GetById(id);
+                if (user == null)
+                {
+                    _logger.LogWarning("User not found: {UserId}", id);
+                    return NotFound(new { Message = "User not found" });
+                }
+
+                return Ok(new
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Rating = user.Rating,
+                    AvatarUrl = user.AvatarUrl,
+                    CreatedAt = user.CreatedAt
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user: {UserId}", id);
+                return StatusCode(500, new { Message = "Internal server error", Details = ex.Message });
+            }
+        }
+
         [HttpGet("profile/{userId}")]
         public async Task<IActionResult> GetProfile(int userId)
         {
             try
             {
-                var user = await _userRepository.GetProfile(userId);
+                var user = await _userRepository.GetById(userId);
                 if (user == null)
                 {
                     _logger.LogWarning("User not found: {UserId}", userId);
                     return NotFound(new { Message = "User not found." });
                 }
 
+                var certificates = await _certificateRepository.GetCertificatesByUser(userId);
+
                 return Ok(new
                 {
-                    user.Id,
-                    user.Username,
-                    user.Email,
-                    user.Rating,
-                    Certificates = user.Certificates?.Select(c => new
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Rating = user.Rating,
+                    AvatarUrl = user.AvatarUrl,
+                    Certificates = certificates.Select(c => new
                     {
                         c.Id,
                         c.CourseId,
-                        CourseName = c.Course?.Name,
+                        CourseName = c.Course?.Name ?? "Unknown Course",
                         c.CertificateUrl,
-                        c.IssueDate
-                    })
+                        IssueDate = c.IssueDate
+                    }).ToList()
                 });
             }
             catch (Exception ex)
@@ -164,6 +204,63 @@ namespace NexiumCode.Controllers
                 _logger.LogError(ex, "Error updating rating for user: {UserId}", userId);
                 return StatusCode(500, new { Message = "Internal server error updating rating.", Details = ex.Message });
             }
+        }
+
+        [HttpPost("upload-avatar")]
+        public async Task<IActionResult> UploadAvatar([FromForm] IFormFile avatar, [FromQuery] int userId)
+        {
+            if (avatar == null || avatar.Length == 0)
+            {
+                return BadRequest(new { Message = "No file uploaded" });
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+            var extension = Path.GetExtension(avatar.FileName).ToLower();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest(new { Message = "Invalid file type. Only jpg, jpeg, png, gif allowed" });
+            }
+
+            if (avatar.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest(new { Message = "File too large. Max 5MB" });
+            }
+
+            var user = await _userRepository.GetById(userId);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            var avatarsPath = Path.Combine("wwwroot", "images", "avatars");
+            if (!Directory.Exists(avatarsPath))
+            {
+                Directory.CreateDirectory(avatarsPath);
+            }
+
+            if (!string.IsNullOrEmpty(user.AvatarUrl) && user.AvatarUrl != "/images/avatars/default-avatar.png")
+            {
+                var oldPath = Path.Combine("wwwroot", user.AvatarUrl.TrimStart('/'));
+                if (System.IO.File.Exists(oldPath))
+                {
+                    System.IO.File.Delete(oldPath);
+                }
+            }
+
+            var fileName = $"{userId}_{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(avatarsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await avatar.CopyToAsync(stream);
+            }
+
+            user.AvatarUrl = $"/images/avatars/{fileName}";
+            await _userRepository.Update(user);
+            await _userRepository.SaveChanges();
+
+            return Ok(new { AvatarUrl = user.AvatarUrl });
         }
     }
 }

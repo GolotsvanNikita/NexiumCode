@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 import './Navbar.css';
 
@@ -7,13 +7,16 @@ interface NavbarProps
     isAuthenticated: boolean;
     logout: () => void;
     userId: number | null;
+    userAvatar?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout, userId }) =>
+export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout, userId, userAvatar }) =>
 {
+    const navigate = useNavigate();
+
     return (
         <nav>
-            <Link to="/">NexiumCode</Link>
+            <Link to="/" className='mainLogo'>NexiumCode</Link>
             <div className="nav-center">
                 <Dropdown>
                     <Dropdown.Toggle className="dropdown-toggle">Courses</Dropdown.Toggle>
@@ -40,7 +43,14 @@ export const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, logout, userId 
             <div className="nav-right">
                 {isAuthenticated ? (
                     <>
-                        <Link to={`/profile/${userId}`}>Profile</Link>
+                        {isAuthenticated && userId && (
+                            <img
+                                src={userAvatar ? `http://localhost:5064${userAvatar}` : 'http://localhost:5064/images/avatars/default-avatar.png'}
+                                alt="Profile"
+                                className="nav-avatar"
+                                onClick={() => navigate(`/profile/${userId}`)}
+                            />
+                        )}
                         <button onClick={logout}>Logout</button>
                     </>
                 ) : (
