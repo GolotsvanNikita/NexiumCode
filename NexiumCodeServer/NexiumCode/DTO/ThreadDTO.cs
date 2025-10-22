@@ -8,9 +8,11 @@ namespace NexiumCode.DTO
         public int UserId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string Category { get; set; }
         public bool IsResolved { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public string Username { get; set; }
+        public string AvatarUrl { get; set; }
         public int ReplyCount { get; set; }
         public List<ReplyDTO> Replies { get; set; }
     }

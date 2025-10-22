@@ -12,5 +12,8 @@ namespace NexiumCode.DTO
 
         [Required]
         public string Content { get; set; }
+
+        [Required]
+        public string Category { get; set; }
     }
 }

@@ -1,187 +1,185 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { forumService, type Thread } from "../services/forumService";
 import "./Forum.css";
-import { Link, useNavigate } from "react-router-dom";
-import iconChat from "/icon1.png";
 
-interface Topic {
-  id: number;
-  title: string;
-  author: string;
-  avatar: string;
-  date: string;
-  replies: number;
-  lastReply: {
-    author: string;
-    time: string;
-  };
-  category: string;
-  status: "open" | "solved";
-}
-
-export const Forum: React.FC = () => {
+export const Forum: React.FC = () =>
+{
   const navigate = useNavigate();
-
-  const [topics] = useState<Topic[]>([
-    {
-      id: 1,
-      title: "Как оптимизировать React-приложение?",
-      author: "Alina Rubak",
-      avatar: "/avatar1.jpg",
-      date: "2 дня назад",
-      replies: 5,
-      lastReply: { author: "Oleg Makey", time: "3 часа назад" },
-      category: "JavaScript",
-      status: "open",
-    },
-    {
-      id: 2,
-      title: "Ошибка при работе с асинхронностью в C#",
-      author: "Ivan Petrov",
-      avatar: "/avatar2.png",
-      date: "5 дней назад",
-      replies: 2,
-      lastReply: { author: "Dmitry B.", time: "вчера" },
-      category: "C#",
-      status: "solved",
-    },
-    {
-      id: 3,
-      title: "Советы по верстке адаптивных сайтов?",
-      author: "Maria Sidorova",
-      avatar: "/avatar3.png",
-      date: "неделю назад",
-      replies: 7,
-      lastReply: { author: "Alex K.", time: "5 часов назад" },
-      category: "HTML/CSS",
-      status: "open",
-    },
-  ]);
-
-  const [categoryFilter, setCategoryFilter] = useState("Все");
-  const [statusFilter, setStatusFilter] = useState("Все");
-  const [sortBy, setSortBy] = useState("Популярные");
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredTopics = useMemo(() => {
-    let filtered = [...topics];
+  const categories = ["all", "JavaScript", "C#", "HTML/CSS", "Python"];
 
+  useEffect(() =>
+  {
+    loadThreads();
+  }, [selectedCategory, searchQuery]);
 
-    if (categoryFilter !== "Все") {
-      filtered = filtered.filter((t) => t.category === categoryFilter);
+  const loadThreads = async () =>
+  {
+    try
+    {
+      setLoading(true);
+      setError(null);
+      const category = selectedCategory === "all" ? undefined : selectedCategory;
+      const data = await forumService.getThreads(category, searchQuery || undefined);
+      setThreads(data);
     }
-
-
-    if (statusFilter !== "Все") {
-      filtered = filtered.filter((t) => t.status === statusFilter);
+    catch (err)
+    {
+      console.error("Error loading threads:", err);
+      setError("Failed to load threads. Please try again.");
     }
-
-
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (t) =>
-          t.title.toLowerCase().includes(query) ||
-          t.author.toLowerCase().includes(query) ||
-          t.category.toLowerCase().includes(query)
-      );
+    finally
+    {
+      setLoading(false);
     }
+  };
 
-    if (sortBy === "Популярные") filtered.sort((a, b) => b.replies - a.replies);
-    if (sortBy === "Новые") filtered.sort((a, b) => b.id - a.id);
+  const formatDate = (dateString: string) =>
+  {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-    return filtered;
-  }, [topics, categoryFilter, statusFilter, sortBy, searchQuery]);
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString("en-US");
+  };
+
+  const handleThreadClick = (thread: Thread) =>
+  {
+    navigate(`/forum/${thread.id}`, { state: { thread } });
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
+  {
+    setSearchQuery(e.target.value);
+  };
+
+  const ThreadSkeleton = () => (
+      <div className="thread-card skeleton-card">
+        <div className="skeleton skeleton-avatar"></div>
+        <div className="thread-main">
+          <div className="thread-info">
+            <div className="skeleton skeleton-title"></div>
+            <div className="skeleton skeleton-meta"></div>
+          </div>
+          <div className="thread-stats">
+            <div className="skeleton skeleton-stat"></div>
+            <div className="skeleton skeleton-status"></div>
+          </div>
+        </div>
+      </div>
+  );
 
   return (
-    <div className="forum-page">
-      <div className="forum-header">
-        <h1 className="forum-title">Форум</h1>
-        <button
-          className="create-topic-button"
-          onClick={() => navigate("/forum/create")}
-        >
-          + Создать тему
-        </button>
-      </div>
+      <div className="forum-container">
+        <div className="forum-header">
+          <h1>Community Forum</h1>
+          <button className="create-thread-btn" onClick={() => navigate("/forum/create")}>
+            + Create Thread
+          </button>
+        </div>
 
-  
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="Поиск по содержимому..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
-        />
+        <div className="forum-search">
+          <input
+              type="text"
+              placeholder="Search threads..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="search-input"
+          />
+        </div>
 
-        <select className="filterBox" onChange={(e) => setCategoryFilter(e.target.value)}>
-          <option>Все</option>
-          <option>JavaScript</option>
-          <option>C#</option>
-          <option>HTML/CSS</option>
-        </select>
+        <div className="forum-filters">
+          {categories.map((cat) => (
+              <button
+                  key={cat}
+                  className={`filter-btn ${selectedCategory === cat ? "active" : ""}`}
+                  onClick={() => setSelectedCategory(cat)}
+              >
+                {cat === "all" ? "All" : cat}
+              </button>
+          ))}
+        </div>
 
-        <select className="filterBox" onChange={(e) => setStatusFilter(e.target.value)}>
-          <option>Все</option>
-          <option value="open">Открыта</option>
-          <option value="solved">Решена</option>
-        </select>
+        {loading && (
+            <div className="threads-list">
+              {[1, 2, 3, 4, 5].map((n) => (
+                  <ThreadSkeleton key={n} />
+              ))}
+            </div>
+        )}
 
-        <select  className="filterBox" onChange={(e) => setSortBy(e.target.value)}>
-          <option>Популярные</option>
-          <option>Новые</option>
-        </select>
-      </div>
+        {error && <div className="error-message">{error}</div>}
 
+        {!loading && !error && threads.length === 0 && (
+            <div className="no-threads">
+              <p>No threads found</p>
+              <button onClick={() => navigate("/forum/create")}>Create the first thread</button>
+            </div>
+        )}
 
-      <div className="topics-list">
-        {filteredTopics.length === 0 ? (
-          <div className="empty-message">Ничего не найдено по запросу 😕</div>
-        ) : (
-          filteredTopics.map((topic) => (
-            <Link
-              key={topic.id}
-              to={`/forum/${topic.id}`}
-              state={{ topic }}
-              className="topic-card-link"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <div className="topic-card" style={{ cursor: "pointer" }}>
-                <img
-                  src={topic.avatar}
-                  alt={topic.author}
-                  className="topic-avatar"
-                />
-                <div className="topic-content">
-                  <div className="topic-main">
-                    <h3 className="topic-title">{topic.title}</h3>
-                    <span className="topic-meta">
-                      Автор: {topic.author} • {topic.date}
-                    </span>
+        {!loading && !error && (
+            <div className="threads-list">
+              {threads.map((thread) => (
+                  <div
+                      key={thread.id}
+                      className="thread-card"
+                      onClick={() => handleThreadClick(thread)}
+                  >
+                    <img
+                        src={thread.avatarUrl ? `http://localhost:5064${thread.avatarUrl}` : 'http://localhost:5064/images/avatars/default-avatar.png'}
+                        alt={thread.username}
+                        className="thread-avatar"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/profile/${thread.userId}`);
+                        }}
+                    />
+                    <div className="thread-main">
+                      <div className="thread-info">
+                        <h3 className="thread-title">{thread.title}</h3>
+                        <div className="thread-meta">
+                        <span
+                            className="thread-author"
+                            onClick={(e) =>
+                            {
+                              e.stopPropagation();
+                              navigate(`/profile/${thread.userId}`);
+                            }}
+                        >
+                          {thread.username}
+                        </span>
+                          <span className="thread-date">{formatDate(thread.createdAt)}</span>
+                          <span className={`thread-category ${thread.category.toLowerCase().replace(/[\/]/g, '-')}`}>
+                          {thread.category}
+                        </span>
+                        </div>
+                      </div>
+                      <div className="thread-stats">
+                        <div className="stat">
+                          <span className="stat-value">{thread.replyCount}</span>
+                          <span className="stat-label">replies</span>
+                        </div>
+                        <div className={`thread-status ${thread.isResolved ? "resolved" : "open"}`}>
+                          {thread.isResolved ? "✓ Solved" : "Open"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="topic-info">
-                    <span className="topic-replies">
-                      <img className = "icon"src = {iconChat}></img> {topic.replies} ответов
-                    </span>
-                    <span className="topic-last">
-                      Последний ответ: <b>{topic.lastReply.author}</b> —{" "}
-                      {topic.lastReply.time}
-                    </span>
-                    <span
-                      className={`topic-category ${topic.category.toLowerCase()}`}
-                    >
-                      {topic.category}
-                    </span>
-                    <span className={`topic-status ${topic.status}`}>
-                      {topic.status === "solved" ? "Решено" : "Открыта"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))
+              ))}
+            </div>
         )}
       </div>
-    </div>
   );
 };

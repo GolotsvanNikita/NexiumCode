@@ -4,11 +4,9 @@ namespace NexiumCode.Repositories
 {
     public interface IForumThreadRepository : IRepository<ForumThread>
     {
+        Task<ForumThread> GetThreadWithReplies(int id);
         Task<IEnumerable<ForumThread>> GetThreadsWithReplies();
-        Task<ForumThread> GetThreadWithReplies(int threadId);
-
-        Task MarkAsResolved(int threadId);
-
-        Task SoftDelete(int threadId);
+        Task MarkAsResolved(int id);
+        Task SoftDelete(int id);
     }
 }

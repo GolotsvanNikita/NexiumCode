@@ -1,10 +1,7 @@
-/* =========================
-   Forum Thread Styles (NexiumCode)
-   ========================= */
-
-.thread-container {
+.thread-container
+{
   max-width: 800px;
-  margin: 60px auto;
+  margin: 100px auto 60px;
   background: #f7f5f1;
   padding: 30px;
   border-radius: 16px;
@@ -13,7 +10,27 @@
   font-family: "Inter", system-ui, sans-serif;
 }
 
-/* ---------- Кнопка назад ---------- */
+.loading,
+.error-message
+{
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+}
+
+.loading
+{
+  color: #666;
+}
+
+.error-message
+{
+  color: #d32f2f;
+  background: #ffebee;
+  border-radius: 10px;
+  border: 1px solid #ffcdd2;
+}
+
 .back-button {
   background: none;
   border: none;
@@ -29,7 +46,6 @@
   text-decoration: underline;
 }
 
-/* ---------- Заголовок темы ---------- */
 .topic-header {
   display: flex;
   justify-content: space-between;
@@ -59,7 +75,12 @@
   text-transform: capitalize;
 }
 
-/* ---------- Статусы ---------- */
+.topic-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .topic-status {
   padding: 6px 14px;
   border-radius: 20px;
@@ -75,13 +96,84 @@
   border: 1px solid #bde4c5;
 }
 
-.topic-status.closed {
-  background: #fdeaea;
-  color: #a12727;
-  border: 1px solid #f5b5b5;
+.topic-status.solved {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
 }
 
-/* ---------- Комментарии ---------- */
+.resolve-button,
+.delete-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resolve-button {
+  background: #dff7e1;
+  color: #147c37;
+}
+
+.resolve-button:hover {
+  background: #c8f0ca;
+}
+
+.delete-button {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.delete-button:hover {
+  background: #ffcdd2;
+}
+
+.thread-content {
+  background: #ffffff;
+  border: 1px solid #e3dfd7;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.thread-author-info {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e3dfd7;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.thread-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.thread-text {
+  line-height: 1.6;
+  color: #333;
+}
+
+.comments-section {
+  margin-top: 30px;
+}
+
+.comments-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 20px;
+}
+
 .comments-list {
   display: flex;
   flex-direction: column;
@@ -95,15 +187,6 @@
   margin-top: 25px;
   padding-top: 15px;
   border-top: 1px solid #e3dfd7;
-}
-
-.avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #ddd;
-  border: 2px solid #e3dfd7;
 }
 
 .input-wrapper {
@@ -128,6 +211,11 @@
   outline: none;
 }
 
+.comment-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .comment-actions {
   display: flex;
   justify-content: flex-end;
@@ -145,12 +233,17 @@
   transition: all 0.25s ease;
 }
 
-.comment-button:hover {
+.comment-button:hover:not(:disabled) {
   background: #2a2a2a;
   transform: translateY(-1px);
 }
 
-/* ---------- Карточка комментария ---------- */
+.comment-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .comment {
   display: flex;
   flex-direction: column;
@@ -170,15 +263,6 @@
   gap: 12px;
 }
 
-.comment-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #ddd;
-  border: 2px solid #e3dfd7;
-  object-fit: cover;
-}
-
 .comment-info {
   display: flex;
   flex-direction: column;
@@ -186,7 +270,7 @@
 
 .comment-author {
   font-weight: 600;
-  color: #111;
+  color: #2563eb;
 }
 
 .comment-date {
@@ -216,7 +300,7 @@
 
 .reply-box {
   margin-top: 10px;
-  margin-left: 50px;
+  margin-left: 0;
 }
 
 .reply-actions {
@@ -231,6 +315,7 @@
   border: none;
   color: #777;
   cursor: pointer;
+  padding: 8px 14px;
 }
 
 .cancel-button:hover {
@@ -238,11 +323,13 @@
 }
 
 .replies {
-  margin-left: 50px;
+  margin-left: 40px;
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding-left: 15px;
+  border-left: 2px solid #e3dfd7;
 }
 
 .comment-text pre {
@@ -261,8 +348,102 @@
   font-family: "Fira Code", monospace;
 }
 
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e3dfd7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
+.comment-avatar:hover {
+  border-color: #2563eb;
+  transform: scale(1.05);
+}
 
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.comment-author {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.comment-author:hover {
+  text-decoration: underline;
+}
+
+.thread-author-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.thread-author-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #1a1a1a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.thread-author-avatar:hover {
+  transform: scale(1.1);
+  border-color: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.thread-author-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.author-name:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+.thread-date {
+  font-size: 0.85rem;
+  color: #5a5a5a;
+}
+
+.skeleton {
+  background: linear-gradient(
+          90deg,
+          #e3dfd7 25%,
+          #f0ede6 50%,
+          #e3dfd7 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 
 @media (max-width: 768px) {
   .thread-container {
@@ -275,18 +456,20 @@
     gap: 10px;
   }
 
+  .topic-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
   .new-comment {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
-  .avatar {
-    margin-bottom: 10px;
-  }
-
   .reply-box,
   .replies {
     margin-left: 0;
+    padding-left: 10px;
   }
 }

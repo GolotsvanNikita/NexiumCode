@@ -1,81 +1,83 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './CustomCursor.css';
 
-export const CustomCursor = () => {
+export const CustomCursor = () =>
+{
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [isHovering, setIsHovering] = useState(false);
     const [isLightBackground, setIsLightBackground] = useState(true);
+    const rafRef = useRef<number>(1);
+    const lastCheckTime = useRef(0);
 
-    useEffect(() => {
-        const updatePosition = (e: MouseEvent) => {
-            setPosition({ x: e.clientX, y: e.clientY });
+    useEffect(() =>
+    {
+        let mouseX = 0;
+        let mouseY = 0;
+
+        const updatePosition = (e: MouseEvent) =>
+        {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            if (rafRef.current)
+            {
+                cancelAnimationFrame(rafRef.current);
+            }
+
+            rafRef.current = requestAnimationFrame(() =>
+            {
+                setPosition({ x: mouseX, y: mouseY });
+            });
         };
 
-        const checkBackground = (e: MouseEvent) => {
-            let target = e.target as HTMLElement;
-
-            // Проверяем, это кнопка, ссылка или кликабельный элемент
-            if (
+        const checkInteractive = (target: HTMLElement): boolean =>
+        {
+            return (
                 target.tagName === 'BUTTON' ||
                 target.tagName === 'A' ||
-                target.closest('button') ||
-                target.closest('a') ||
-                target.classList.contains('lesson-nav-item') ||
-                target.closest('.lesson-nav-item') ||
+                target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                !!target.closest('button') ||
+                !!target.closest('a') ||
                 target.classList.contains('clickable') ||
-                target.style.cursor === 'pointer' ||
                 window.getComputedStyle(target).cursor === 'pointer'
-            ) {
-                setIsHovering(true);
-            } else {
-                setIsHovering(false);
+            );
+        };
+
+        const checkBackground = (e: MouseEvent) =>
+        {
+            const now = Date.now();
+            if (now - lastCheckTime.current < 100) return;
+            lastCheckTime.current = now;
+
+            const target = e.target as HTMLElement;
+
+            setIsHovering(checkInteractive(target));
+
+            const nav = document.querySelector('nav');
+            const navRect = nav?.getBoundingClientRect();
+
+            if (navRect && e.clientY < navRect.bottom)
+            {
+                setIsLightBackground(false);
             }
-
-            // Ищем первый элемент с реальным фоном, игнорируя текстовые элементы
-            let currentElement: HTMLElement | null = target;
-            let bgColor = 'rgba(0, 0, 0, 0)';
-
-            while (currentElement && currentElement !== document.body) {
-                const computedStyle = window.getComputedStyle(currentElement);
-                const bg = computedStyle.backgroundColor;
-
-                // Проверяем, не прозрачный ли фон
-                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
-                    bgColor = bg;
-                    break;
-                }
-
-                currentElement = currentElement.parentElement;
-            }
-
-            // Если не нашли фон, используем body
-            if (bgColor === 'rgba(0, 0, 0, 0)') {
-                bgColor = window.getComputedStyle(document.body).backgroundColor;
-            }
-
-            // Парсим RGB значения
-            const rgb = bgColor.match(/\d+/g);
-            if (rgb) {
-                const r = parseInt(rgb[0]);
-                const g = parseInt(rgb[1]);
-                const b = parseInt(rgb[2]);
-
-                // Вычисляем яркость (формула относительной яркости)
-                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-
-                // Если яркость больше 128 - светлый фон, иначе темный
-                setIsLightBackground(brightness > 128);
+            else
+            {
+                setIsLightBackground(true);
             }
         };
 
-        window.addEventListener('mousemove', updatePosition);
-        window.addEventListener('mousemove', checkBackground);
-        window.addEventListener('mouseover', checkBackground);
+        window.addEventListener('mousemove', updatePosition, { passive: true });
+        window.addEventListener('mousemove', checkBackground, { passive: true });
 
-        return () => {
+        return () =>
+        {
             window.removeEventListener('mousemove', updatePosition);
             window.removeEventListener('mousemove', checkBackground);
-            window.removeEventListener('mouseover', checkBackground);
+            if (rafRef.current)
+            {
+                cancelAnimationFrame(rafRef.current);
+            }
         };
     }, []);
 
@@ -89,10 +91,10 @@ export const CustomCursor = () => {
             style={{
                 left: `${position.x}px`,
                 top: `${position.y}px`,
+                willChange: 'left, top',
             }}
         >
             <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                {/* Внешний круг */}
                 <circle
                     cx="16"
                     cy="16"
@@ -102,8 +104,6 @@ export const CustomCursor = () => {
                     strokeWidth="2.5"
                     className="cursor-outer"
                 />
-
-                {/* Внутренний акцент */}
                 <circle
                     cx="16"
                     cy="16"
@@ -114,8 +114,6 @@ export const CustomCursor = () => {
                     opacity="0.4"
                     className="cursor-middle"
                 />
-
-                {/* Центральная точка */}
                 <circle
                     cx="16"
                     cy="16"
