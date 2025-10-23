@@ -17,6 +17,11 @@ export interface Thread
     replies?: Reply[];
 }
 
+export interface PaginatedThreadsResponse{
+
+    items: Thread[],
+    totalCount:number,
+}
 
 export interface Reply
 {
@@ -48,11 +53,13 @@ export interface CreateReplyRequest
 
 class ForumService
 {
-    async getThreads(category?: string, search?: string): Promise<Thread[]>
+    async getThreads(category?: string, search?: string, page: number=1 , pageSize: number= 5): Promise<PaginatedThreadsResponse>
     {
         const params: any = {};
         if (category) params.category = category;
         if (search) params.search = search;
+        params.page = page;
+        params.pageSize = pageSize;
 
         const response = await axios.get(`${API_BASE_URL}/forum/threads`, { params });
         return response.data;
@@ -98,6 +105,17 @@ class ForumService
         const response = await axios.get(`${API_BASE_URL}/forum/categories`);
         return response.data;
     }
+    async uploadImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axios.post(`${API_BASE_URL}/forum/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response.data.imageUrl;
+}
+
 }
 
 export const forumService = new ForumService();

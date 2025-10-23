@@ -19,40 +19,30 @@ namespace NexiumCode.Controllers
         }
 
         [HttpGet("threads")]
-        public async Task<IActionResult> GetThreads([FromQuery] string category = null, [FromQuery] string search = null)
+        public async Task<IActionResult> GetThreads(string? category, string? search, int page = 1, int pageSize = 5)
         {
-            var threads = await _thread.GetThreadsWithReplies();
+            var (threads, totalCount) = await _thread.GetThreadsPagedAsync(category, search, page, pageSize);
 
-            if (!string.IsNullOrEmpty(category))
+            var result = new
             {
-                threads = threads.Where(t => t.Category == category).ToList();
-            }
+                items = threads.Select(t => new
+                {
+                    t.Id,
+                    t.Title,
+                    t.Content,
+                    t.Category,
+                    t.CreatedAt,
+                    t.IsResolved,
+                    t.UserId,
+                    Username = t.User?.Username,
+                    AvatarUrl = t.User?.AvatarUrl,
+                    ReplyCount = t.Replies?.Count ?? 0,
+                }),
+                totalCount
+            };
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                threads = threads.Where(t =>
-                    t.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    t.Content.Contains(search, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-
-            var response = threads.Select(t => new ThreadDTO
-            {
-                Id = t.Id,
-                UserId = t.UserId,
-                Title = t.Title,
-                Content = t.Content,
-                Category = t.Category,
-                IsResolved = t.IsResolved,
-                CreatedAt = t.CreatedAt,
-                Username = t.User?.Username,
-                AvatarUrl = t.User?.AvatarUrl,
-                ReplyCount = t.Replies?.Count(r => r.ParentReplyId == null) ?? 0
-            });
-
-            return Ok(response);
+            return Ok(result);
         }
-
         [HttpGet("threads/{threadId}")]
         public async Task<IActionResult> GetThread(int threadId)
         {
@@ -236,5 +226,28 @@ namespace NexiumCode.Controllers
 
             return dto;
         }
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "No file uploaded." });
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{uniqueFileName}";
+            return Ok(new { imageUrl = fileUrl });
+        }
+
     }
 }

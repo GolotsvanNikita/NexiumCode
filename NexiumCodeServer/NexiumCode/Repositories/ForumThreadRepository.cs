@@ -51,5 +51,28 @@ namespace NexiumCode.Repositories
                 await Update(thread);
             }
         }
+        public async Task<(IEnumerable<ForumThread> Threads, int TotalCount)> GetThreadsPagedAsync(string? category, string? search,int page,int pageSize)
+            {
+                var query = _context.ForumThreads
+                    .Include(t => t.Replies)
+                    .Include(t => t.User)
+                    .Where(t => !t.IsDeleted);
+
+                if (!string.IsNullOrEmpty(category))
+                    query = query.Where(t => t.Category == category);
+
+                if (!string.IsNullOrEmpty(search))
+                    query = query.Where(t => t.Title.Contains(search) || t.Content.Contains(search));
+
+                var totalCount = await query.CountAsync();
+
+                var threads = await query
+                    .OrderByDescending(t => t.CreatedAt)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return (threads, totalCount);
+            }
     }
 }
