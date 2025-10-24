@@ -1,45 +1,109 @@
 .profile-container
 {
     min-height: calc(100vh - 70px);
-    background: #e8e3db;
+    background: linear-gradient(135deg, #e8e3db 0%, #d4cfc4 100%);
     padding: 40px 20px;
     margin-top: 70px;
 }
 
 .profile-card
 {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     background: #faf8f5;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 40px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    border: 2px solid #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 3px solid #1a1a1a;
 }
 
 .profile-header
 {
     text-align: center;
-    margin-bottom: 40px;
-    padding-bottom: 30px;
-    border-bottom: 2px solid #d4cfc4;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #d4cfc4;
+}
+
+.profile-avatar-wrapper
+{
+    position: relative;
+    display: inline-block;
+    margin: 0 auto 20px;
+}
+
+.profile-avatar-img
+{
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #1a1a1a;
+    display: block;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-upload-btn
+{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #1a1a1a;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: 3px solid #faf8f5;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-upload-btn:hover
+{
+    background: #000000;
+    transform: scale(1.15) rotate(10deg);
+}
+
+.download
+{
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
 }
 
 .profile-header h1
 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     color: #1a1a1a;
-    margin-bottom: 10px;
-    font-weight: 700;
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: -1px;
 }
 
 .profile-email
 {
     color: #5a5a5a;
     font-size: 1.1rem;
+    margin-bottom: 15px;
 }
 
-.profile-stats
+.streak-badge
+{
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    margin-top: 10px;
+}
+
+.profile-main-stats
 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -47,30 +111,221 @@
     margin-bottom: 40px;
 }
 
-.stat-item
+.elo-card, .level-card
 {
-    background: #f0ede6;
+    background: linear-gradient(135deg, #f0ede6 0%, #e8e3db 100%);
     padding: 25px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid #d4cfc4;
+    border-radius: 16px;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.stat-label
+.elo-label
 {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #5a5a5a;
     margin-bottom: 10px;
     text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.elo-value
+{
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rank-badge
+{
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
     letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.level-header
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.level-label
+{
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+.level-xp
+{
+    font-size: 0.9rem;
+    color: #5a5a5a;
     font-weight: 600;
 }
 
-.stat-value
+.xp-bar
+{
+    width: 100%;
+    height: 20px;
+    background: #d4cfc4;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.xp-fill
+{
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.skill-tree-section
+{
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, #f7f5f1 0%, #f0ede6 100%);
+    border-radius: 16px;
+    border: 2px solid #1a1a1a;
+}
+
+.skill-tree-section h2
+{
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin-bottom: 25px;
+    font-weight: 800;
+}
+
+.skill-tree
+{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.skill-branch
+{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #faf8f5;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #d4cfc4;
+    transition: all 0.3s ease;
+}
+
+.skill-branch:hover
+{
+    transform: translateX(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-color: #1a1a1a;
+}
+
+.skill-icon
 {
     font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e8e3db, #d4cfc4);
+    border-radius: 12px;
+    border: 2px solid #1a1a1a;
+    flex-shrink: 0;
+}
+
+.skill-info
+{
+    flex: 1;
+}
+
+.skill-name
+{
+    font-size: 1.2rem;
+    font-weight: 700;
     color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.skill-bar
+{
+    width: 100%;
+    height: 16px;
+    background: #d4cfc4;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+}
+
+.skill-fill
+{
+    height: 100%;
+    transition: width 0.6s ease;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.skill-value
+{
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: right;
+}
+
+.achievements-section
+{
+    margin-bottom: 40px;
+}
+
+.achievements-section h2
+{
+    font-size: 1.8rem;
+    color: #1a1a1a;
+    margin-bottom: 20px;
     font-weight: 800;
+}
+
+.achievements-grid
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.achievement-badge
+{
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.achievement-badge:hover
+{
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
 }
 
 .certificates-section
@@ -83,7 +338,7 @@
     font-size: 1.8rem;
     color: #1a1a1a;
     margin-bottom: 20px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .certificates-list
@@ -94,42 +349,43 @@
 
 .certificate-card
 {
-    background: #f0ede6;
+    background: linear-gradient(135deg, #f0ede6, #e8e3db);
     padding: 25px;
     border-radius: 12px;
-    border: 1px solid #d4cfc4;
+    border: 2px solid #1a1a1a;
     transition: all 0.3s ease;
 }
 
 .certificate-card:hover
 {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .certificate-card h3
 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: #1a1a1a;
     margin-bottom: 10px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .certificate-card p
 {
     color: #5a5a5a;
     margin-bottom: 15px;
+    font-size: 0.95rem;
 }
 
 .certificate-card a
 {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background: #1a1a1a;
     color: #e8e3db;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 10px;
+    font-weight: 700;
     transition: all 0.3s ease;
 }
 
@@ -137,54 +393,7 @@
 {
     background: #000000;
     transform: translateX(5px);
-}
-
-.profile-avatar-wrapper
-{
-    position: relative;
-    display: inline-block;
-    margin: 0 auto 20px;
-}
-
-.profile-avatar-img
-{
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #1a1a1a;
-    display: block;
-}
-
-.avatar-upload-btn
-{
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background: #faf8f5;
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    border: 3px solid #faf8f5;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.avatar-upload-btn:hover
-{
-    background: #faf8f5;
-    transform: scale(1.1);
-}
-
-.download
-{
-    width: 25px;
-    height: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .skeleton
@@ -197,7 +406,7 @@
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
-    border-radius: 8px;
+    border-radius: 12px;
 }
 
 @keyframes shimmer
@@ -212,9 +421,69 @@
     }
 }
 
+.skeleton-avatar-large
+{
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+}
+
+.skeleton-title
+{
+    width: 200px;
+    height: 36px;
+    margin: 0 auto 10px;
+}
+
+.skeleton-email
+{
+    width: 250px;
+    height: 20px;
+    margin: 0 auto;
+}
+
+.skeleton-stat
+{
+    width: 100%;
+    height: 80px;
+}
+
+.skill-rank
+{
+    color: #FFD700;
+    font-size: 0.9rem;
+    margin-left: 8px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.streak-icon
+{
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.section-icon
+{
+    width: 64px;
+    height: 64px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.achievement-icon
+{
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
 @media (max-width: 768px)
 {
-    .profile-stats
+    .profile-main-stats
     {
         grid-template-columns: 1fr;
     }
@@ -226,12 +495,51 @@
 
     .profile-avatar-img
     {
-        width: 100px;
-        height: 100px;
+        width: 110px;
+        height: 110px;
     }
 
     .profile-header h1
     {
-        font-size: 2rem;
+        font-size: 2.2rem;
+    }
+
+    .elo-value
+    {
+        font-size: 3rem;
+    }
+
+    .skill-tree-section
+    {
+        padding: 20px;
+    }
+
+    .skill-branch
+    {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .skill-icon
+    {
+        margin-bottom: 10px;
+    }
+
+    .achievements-grid
+    {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px)
+{
+    .profile-header h1
+    {
+        font-size: 1.8rem;
+    }
+
+    .elo-value
+    {
+        font-size: 2.5rem;
     }
 }

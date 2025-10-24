@@ -1,0 +1,255 @@
+*
+{
+    box-sizing: border-box;
+}
+
+.practice-page
+{
+    display: flex;
+    flex-direction: row;
+    min-height: calc(100vh - 70px);
+    background: #e8e3db;
+    margin-top: 70px;
+}
+
+.practice-sidebar
+{
+    width: 320px;
+    flex-shrink: 0;
+    background: #1a1a1a;
+    color: #e8e3db;
+    position: sticky;
+    top: 70px;
+    height: calc(100vh - 70px);
+    overflow-y: hidden;
+}
+
+.sidebar-header
+{
+    padding: 25px 20px;
+    border-bottom: 1px solid rgba(232, 227, 219, 0.2);
+    flex-shrink: 0;
+}
+
+.sidebar-header h2
+{
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #e8e3db;
+}
+
+.progress-widget
+{
+    padding: 20px;
+    background: rgba(232, 227, 219, 0.1);
+    margin: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(232, 227, 219, 0.15);
+    flex-shrink: 0;
+}
+
+.progress-label
+{
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #e8e3db;
+}
+
+.progress-bar-container
+{
+    background: rgba(232, 227, 219, 0.2);
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar-fill
+{
+    background: #e8e3db;
+    height: 100%;
+    transition: width 0.6s ease;
+    border-radius: 6px;
+}
+
+.completion-badge
+{
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(76, 175, 80, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #81c784;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.tasks-nav
+{
+    padding: 10px 20px 20px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.tasks-nav ul
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-btn
+{
+    width: 100%;
+    padding: 15px 20px;
+    background: transparent;
+    color: #e8e3db;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    font-size: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 8px;
+}
+
+.task-btn:hover
+{
+    background: rgba(232, 227, 219, 0.1);
+}
+
+.task-btn.active
+{
+    background: rgba(232, 227, 219, 0.2);
+    font-weight: 600;
+}
+
+.practice-main
+{
+    flex: 1;
+    min-width: 0;
+    padding: 40px;
+    overflow-y: auto;
+    background: #faf8f5;
+}
+
+.task-content
+{
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.task-title
+{
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.task-description
+{
+    font-size: 1.1rem;
+    color: #3a3a3a;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.expected-output
+{
+    margin-bottom: 20px;
+}
+
+.expected-output h3
+{
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.expected-output pre
+{
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.code-editor
+{
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.task-content .submit-btn
+{
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: #1a1a1a;
+    color: #e8e3db;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.console
+{
+    margin-top: 30px;
+    padding: 20px;
+    background: #1a1a1a;
+    color: #e8e3db;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #000000;
+    max-height: 100px;
+}
+
+.console h3
+{
+    margin-bottom: 15px;
+    color: #e8e3db;
+    font-size: 1.2rem;
+}
+
+.output, .error
+{
+    white-space: pre-wrap;
+    font-family: 'Consolas', monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+.output
+{
+    color: #81c784;
+}
+
+.error
+{
+    color: #e57373;
+    display: block;
+}
+
+.no-task
+{
+    text-align: center;
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-top: 50px;
+}

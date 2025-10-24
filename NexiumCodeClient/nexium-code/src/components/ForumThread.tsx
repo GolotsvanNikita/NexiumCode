@@ -105,6 +105,13 @@ export const ForumThread: React.FC<ForumThreadProps> = ({ userId }) =>
     useEffect(() =>
     {
         loadThread();
+
+        const interval = setInterval(() =>
+        {
+            if (id) loadThread();
+        }, 30000);
+
+        return () => clearInterval(interval);
     }, [id]);
 
     const loadThread = async () =>
@@ -313,7 +320,10 @@ export const ForumThread: React.FC<ForumThreadProps> = ({ userId }) =>
             <div className="thread-content">
                 <div className="thread-author-info">
                     <img
-                        src={thread.avatarUrl ? `http://localhost:5064${thread.avatarUrl}` : 'http://localhost:5064/images/avatars/default-avatar.png'}
+                        src={thread.avatarUrl
+                            ? `http://localhost:5064${thread.avatarUrl}?t=${Date.now()}`
+                            : 'http://localhost:5064/images/avatars/default-avatar.png'
+                        }
                         alt={thread.username}
                         className="thread-author-avatar"
                         onClick={() => navigate(`/profile/${thread.userId}`)}

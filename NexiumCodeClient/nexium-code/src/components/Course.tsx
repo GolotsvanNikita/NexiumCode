@@ -23,19 +23,39 @@ export const Course: React.FC<CourseLandingProps> = ({ userId }) =>
     const [theoryProgress, setTheoryProgress] = useState(0);
     const [isPracticeUnlocked, setIsPracticeUnlocked] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [practiceProgress, setPracticeProgress] = useState(0);
+    const [totalProgress, setTotalProgress] = useState(0);
 
     useEffect(() =>
     {
-        const fetchCourse = async () =>
+        const fetchCourseAndProgress = async () =>
         {
             try
             {
                 const response = await axios.get(`http://localhost:5064/CSharpCourse.json`);
                 setCourse(response.data);
 
+                const progressRes = await axios.get(`/api/Progress/${courseId}?userId=${userId}`);
+                const theory = progressRes.data.theoryProgress || 0;
+                const practice = progressRes.data.practiceProgress || 0;
+                const serverProgress = progressRes.data.theoryProgress || 0;
+                setTheoryProgress(theory);
+                setPracticeProgress(practice);
+                setTotalProgress((theory + practice) / 2);
+                setIsPracticeUnlocked(theory === 100);
+
+                const progressKey = `course_${courseId}_user_${userId}_progress`;
+                localStorage.setItem(progressKey, JSON.stringify({
+                    lessonProgress: {},
+                    theoryProgress: serverProgress
+                }));
+            }
+            catch (err)
+            {
+                console.error('Error loading course or progress:', err);
+
                 const progressKey = `course_${courseId}_user_${userId}_progress`;
                 const savedProgress = localStorage.getItem(progressKey);
-
                 if (savedProgress)
                 {
                     const progress = JSON.parse(savedProgress);
@@ -44,35 +64,16 @@ export const Course: React.FC<CourseLandingProps> = ({ userId }) =>
                 }
                 else
                 {
-                    try
-                    {
-                        const progressRes = await axios.get(`/api/Progress/${courseId}?userId=${userId}`);
-                        const serverProgress = progressRes.data.theoryProgress || 0;
-                        setTheoryProgress(serverProgress);
-                        setIsPracticeUnlocked(serverProgress === 100);
-
-                        localStorage.setItem(progressKey, JSON.stringify({
-                            lessonProgress: {},
-                            theoryProgress: serverProgress
-                        }));
-                    }
-                    catch (err)
-                    {
-                        console.log('No progress found on server');
-                        setTheoryProgress(0);
-                        setIsPracticeUnlocked(false);
-                    }
+                    setTheoryProgress(0);
+                    setIsPracticeUnlocked(false);
                 }
-
-                setLoading(false);
             }
-            catch (err)
+            finally
             {
-                console.error('Error loading course:', err);
                 setLoading(false);
             }
         };
-        fetchCourse();
+        fetchCourseAndProgress();
     }, [courseId, userId]);
 
     if (loading) return <div className="loading">Loading...</div>;
@@ -88,12 +89,12 @@ export const Course: React.FC<CourseLandingProps> = ({ userId }) =>
                 <div className="progress-section">
                     <h3>Your Progress</h3>
                     <div className="progress-bar">
-                        <div className="progress-fill" style={{ width: `${theoryProgress}%` }}>
-                            {theoryProgress > 10 && `${theoryProgress}%`}
+                        <div className="progress-fill" style={{ width: `${totalProgress}%` }}>
+                            {totalProgress > 10 && `${totalProgress}%`}
                         </div>
                     </div>
                     <p className="progress-text">
-                        Theory: {theoryProgress}% completed
+                        Theory: {theoryProgress}% | Practice: {practiceProgress}% | Total: {totalProgress}%
                     </p>
                 </div>
 

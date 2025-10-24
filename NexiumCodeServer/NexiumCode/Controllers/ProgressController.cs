@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NexiumCode.DTO;
 using NexiumCode.Repositories;
+using NexiumCode.Services;
 using System.Threading.Tasks;
 
 namespace NexiumCode.Controllers
@@ -10,44 +11,28 @@ namespace NexiumCode.Controllers
     public class ProgressController : ControllerBase
     {
         private readonly IProgressRepository _progressRepository;
+        private readonly IXPService _xpService;
         private readonly ILogger<ProgressController> _logger;
 
-        public ProgressController(IProgressRepository progressRepository, ILogger<ProgressController> logger)
+        public ProgressController(
+            IProgressRepository progressRepository,
+            IXPService xpService,
+            ILogger<ProgressController> logger)
         {
             _progressRepository = progressRepository;
+            _xpService = xpService;
             _logger = logger;
         }
 
         [HttpGet("{courseId}")]
         public async Task<IActionResult> GetProgress(int courseId, [FromQuery] int userId)
         {
-            _logger.LogInformation($"GetProgress called: courseId={courseId}, userId={userId}");
-
-            try
+            var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
+            if (progress == null)
             {
-                var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
-
-                if (progress == null)
-                {
-                    _logger.LogInformation($"No progress found for user {userId} and course {courseId}, returning default values");
-
-                    return Ok(new
-                    {
-                        UserId = userId,
-                        CourseId = courseId,
-                        TheoryProgress = 0,
-                        PracticeProgress = 0,
-                        LastUpdated = DateTimeOffset.UtcNow
-                    });
-                }
-
-                return Ok(progress);
+                return Ok(new { TheoryProgress = 0, PracticeProgress = 0 });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error getting progress for user {userId} and course {courseId}");
-                return StatusCode(500, new { Message = "Error retrieving progress.", Details = ex.Message });
-            }
+            return Ok(new { progress.TheoryProgress, progress.PracticeProgress });
         }
 
         [HttpPost("{courseId}/theory")]
@@ -65,6 +50,12 @@ namespace NexiumCode.Controllers
             {
                 await _progressRepository.UpdateTheoryProgress(request.UserId, courseId, request.Progress);
                 await _progressRepository.SaveChanges();
+
+                await _xpService.AddXP(request.UserId, 15, "theory", "Completed theory lesson");
+                await _xpService.AddELO(request.UserId, 5, "Completed theory lesson");
+                await _xpService.UpdateStreak(request.UserId);
+
+                await _xpService.UpdateSkillProgress(request.UserId, "theory", 20);
 
                 _logger.LogInformation($"Theory progress updated successfully for user {request.UserId}, course {courseId}, progress {request.Progress}%");
                 return Ok(new { Message = "Theory progress updated successfully." });
@@ -90,6 +81,10 @@ namespace NexiumCode.Controllers
             {
                 await _progressRepository.UpdatePracticeProgress(request.UserId, courseId, request.Progress);
                 await _progressRepository.SaveChanges();
+
+                await _xpService.AddXP(request.UserId, 35, "practice", "Completed practice task");
+                await _xpService.AddELO(request.UserId, 15, "Completed practice task");
+                await _xpService.UpdateStreak(request.UserId);
 
                 _logger.LogInformation($"Practice progress updated successfully for user {request.UserId}");
                 return Ok(new { Message = "Practice progress updated successfully." });
