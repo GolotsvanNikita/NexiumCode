@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using NexiumCode.DTO;
 using NexiumCode.Models;
 using NexiumCode.Repositories;
+using NexiumCode.Services;
 
 namespace NexiumCode.Controllers
 {
@@ -14,16 +15,19 @@ namespace NexiumCode.Controllers
         private readonly ICertificateRepository _certificateRepository;
         private readonly IProgressRepository _progressRepository;
         private readonly ICourseRepository _courseRepository;
+        private readonly IXPService _xpService;
 
         public CertificateController(
-        ICertificateRepository certificateRepository,
-        IProgressRepository progressRepository,
-        ICourseRepository courseRepository,
-        IConfiguration configuration)
+            ICertificateRepository certificateRepository,
+            IProgressRepository progressRepository,
+            ICourseRepository courseRepository,
+            IXPService xpService,
+            IConfiguration configuration)
         {
             _certificateRepository = certificateRepository;
             _progressRepository = progressRepository;
             _courseRepository = courseRepository;
+            _xpService = xpService;
         }
 
         [HttpGet]
@@ -84,6 +88,10 @@ namespace NexiumCode.Controllers
 
             await _certificateRepository.Add(certificate);
             await _certificateRepository.SaveChanges();
+
+            await _xpService.AddXP(request.UserId, 100, "all", "Certificate earned");
+            await _xpService.AddELO(request.UserId, 30, "Certificate earned");
+            await _xpService.AddAchievement(request.UserId, $"Certificate - {course.Name}");
 
             return Ok(new
             {

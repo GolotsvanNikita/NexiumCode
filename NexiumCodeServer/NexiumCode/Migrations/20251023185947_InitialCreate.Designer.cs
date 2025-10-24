@@ -12,8 +12,8 @@ using NexiumCode.Context;
 namespace NexiumCode.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251010204714_AddLessonProgressTable")]
-    partial class AddLessonProgressTable
+    [Migration("20251023185947_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,6 +63,9 @@ namespace NexiumCode.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -91,6 +94,9 @@ namespace NexiumCode.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("ParentReplyId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ThreadId")
                         .HasColumnType("int");
 
@@ -98,6 +104,8 @@ namespace NexiumCode.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentReplyId");
 
                     b.HasIndex("ThreadId");
 
@@ -113,6 +121,10 @@ namespace NexiumCode.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -274,6 +286,10 @@ namespace NexiumCode.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Explanation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
@@ -300,18 +316,65 @@ namespace NexiumCode.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Achievements")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CommunityStarProgress")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommunityStarRank")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("CurrentStreak")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentXP")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTimeOffset?>("LastActivityDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PracticeProProgress")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PracticeProRank")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizChampionProgress")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizChampionRank")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TheoryMasterProgress")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TheoryMasterRank")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalXP")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
@@ -329,7 +392,7 @@ namespace NexiumCode.Migrations
             modelBuilder.Entity("NexiumCode.Models.Certificate", b =>
                 {
                     b.HasOne("NexiumCode.Models.Course", "Course")
-                        .WithMany()
+                        .WithMany("Certificates")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -347,6 +410,11 @@ namespace NexiumCode.Migrations
 
             modelBuilder.Entity("NexiumCode.Models.ForumReply", b =>
                 {
+                    b.HasOne("NexiumCode.Models.ForumReply", "ParentReply")
+                        .WithMany("ChildReplies")
+                        .HasForeignKey("ParentReplyId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("NexiumCode.Models.ForumThread", "Thread")
                         .WithMany("Replies")
                         .HasForeignKey("ThreadId")
@@ -358,6 +426,8 @@ namespace NexiumCode.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("ParentReply");
 
                     b.Navigation("Thread");
 
@@ -400,7 +470,7 @@ namespace NexiumCode.Migrations
             modelBuilder.Entity("NexiumCode.Models.Progress", b =>
                 {
                     b.HasOne("NexiumCode.Models.Course", "Course")
-                        .WithMany()
+                        .WithMany("Progresses")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -440,7 +510,16 @@ namespace NexiumCode.Migrations
 
             modelBuilder.Entity("NexiumCode.Models.Course", b =>
                 {
+                    b.Navigation("Certificates");
+
                     b.Navigation("Lessons");
+
+                    b.Navigation("Progresses");
+                });
+
+            modelBuilder.Entity("NexiumCode.Models.ForumReply", b =>
+                {
+                    b.Navigation("ChildReplies");
                 });
 
             modelBuilder.Entity("NexiumCode.Models.ForumThread", b =>

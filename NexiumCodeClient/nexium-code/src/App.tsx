@@ -14,6 +14,7 @@ import { Profile } from "./components/Profile.tsx";
 import {CustomCursor} from "./cursor/CustomCursor.tsx";
 import { CreateTopic } from "./components/CreateTopic.tsx";
 import axios from "axios";
+import {Practice} from "./components/Practice.tsx";
 
 const App: React.FC = () =>
 {
@@ -115,6 +116,15 @@ const App: React.FC = () =>
                     element={
                         <PrivateRoute>
                             <CreateTopic userId={userId} />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/courses/:courseId/practice"
+                    element={
+                        <PrivateRoute>
+                            <Practice userId={userId} />
                         </PrivateRoute>
                     }
                 />

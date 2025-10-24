@@ -2,6 +2,7 @@
 using NexiumCode.DTO;
 using NexiumCode.Models;
 using NexiumCode.Repositories;
+using NexiumCode.Services;
 
 namespace NexiumCode.Controllers
 {
@@ -11,11 +12,16 @@ namespace NexiumCode.Controllers
     {
         private readonly IForumThreadRepository _thread;
         private readonly IForumReplyRepository _reply;
+        private readonly IXPService _xpService;
 
-        public ForumController(IForumThreadRepository thread, IForumReplyRepository reply)
+        public ForumController(
+            IForumThreadRepository thread,
+            IForumReplyRepository reply,
+            IXPService xpService)
         {
             _thread = thread;
             _reply = reply;
+            _xpService = xpService;
         }
 
         [HttpGet("threads")]
@@ -62,6 +68,7 @@ namespace NexiumCode.Controllers
                 IsResolved = thread.IsResolved,
                 CreatedAt = thread.CreatedAt,
                 Username = thread.User?.Username,
+                AvatarUrl = thread.User?.AvatarUrl,
                 ReplyCount = thread.Replies?.Count ?? 0
             };
 
@@ -91,6 +98,11 @@ namespace NexiumCode.Controllers
 
             await _thread.Add(thread);
             await _thread.SaveChanges();
+
+            await _xpService.AddXP(request.UserId, 5, "community", "Created forum thread");
+            await _xpService.AddELO(request.UserId, 2, "Created forum thread");
+            await _xpService.UpdateStreak(request.UserId);
+            await _xpService.AddAchievement(request.UserId, "First Steps - Created first thread");
 
             return Ok(new { ThreadId = thread.Id, Message = "Thread created successfully." });
         }
@@ -127,6 +139,10 @@ namespace NexiumCode.Controllers
 
             await _reply.Add(reply);
             await _reply.SaveChanges();
+
+            await _xpService.AddXP(request.UserId, 10, "community", "Posted forum reply");
+            await _xpService.AddELO(request.UserId, 3, "Posted forum reply");
+            await _xpService.UpdateStreak(request.UserId);
 
             return Ok(new { ReplyId = reply.Id, Message = "Reply added successfully." });
         }
@@ -168,6 +184,9 @@ namespace NexiumCode.Controllers
             await _thread.MarkAsResolved(threadId);
             await _thread.SaveChanges();
 
+            await _xpService.AddXP(userId, 25, "community", "Thread marked as solved");
+            await _xpService.AddELO(userId, 10, "Thread marked as solved");
+
             return Ok(new { Message = "Thread marked as resolved." });
         }
 
@@ -190,7 +209,7 @@ namespace NexiumCode.Controllers
             if (allReplies == null || !allReplies.Any())
             {
                 return [];
-            }    
+            }
 
             var rootReplies = allReplies
                 .Where(r => r.ParentReplyId == null)

@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NexiumCode.DTO;
+using NexiumCode.JSON;
+using NexiumCode.Models;
 using NexiumCode.Repositories;
 using System.IO;
-using System.Text.Json;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using NexiumCode.JSON;
 
 namespace NexiumCode.Controllers
 {
@@ -59,16 +60,36 @@ namespace NexiumCode.Controllers
                     var jsonString = await System.IO.File.ReadAllTextAsync(jsonPath);
                     _logger.LogInformation("Successfully read JSON file.");
 
-                    var course = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
+                    var courseJson = JsonSerializer.Deserialize<CourseJson>(jsonString, JsonOptions);
+
+                    var course = await _courseRepository.GetById(courseId);
+                    if (course == null)
+                    {
+                        _logger.LogInformation($"Course with ID {courseId} not found in database, creating new.");
+                        course = new Course
+                        {
+                            Id = courseId,
+                            Name = courseJson.Name,
+                            Description = courseJson.Description
+                        };
+                        await _courseRepository.Add(course);
+                        await _courseRepository.SaveChanges();
+                        _logger.LogInformation($"Course created: ID={courseId}, Name={course.Name}");
+                    }
 
                     var progress = await _progressRepository.GetProgressByUserAndCourse(userId, courseId);
                     var theoryProgress = progress?.TheoryProgress ?? 0;
+                    var practiceProgress = progress?.PracticeProgress ?? 0;
+
+                    var totalProgress = (theoryProgress + practiceProgress) / 2;
 
                     return Ok(new
                     {
-                        course,
+                        course = courseJson,
                         TheoryProgress = theoryProgress,
-                        IsPracticeUnlocked = theoryProgress == 100
+                        PracticeProgress = practiceProgress,
+                        TotalProgress = totalProgress,
+                        IsCourseCompleted = totalProgress == 100
                     });
                 }
                 catch (JsonException ex)

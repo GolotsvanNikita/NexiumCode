@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NexiumCode.DTO;
 using NexiumCode.Repositories;
+using NexiumCode.Services;
 using System.IO;
 using System.Text.Json;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace NexiumCode.Controllers
     public class QuizQuestionController : ControllerBase
     {
         private readonly IQuizQuestionRepository _quizQuestionRepository;
+        private readonly IXPService _xpService;
         private readonly ILogger<QuizQuestionController> _logger;
 
         private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
@@ -23,9 +25,11 @@ namespace NexiumCode.Controllers
 
         public QuizQuestionController(
             IQuizQuestionRepository quizQuestionRepository,
+            IXPService xpService,
             ILogger<QuizQuestionController> logger)
         {
             _quizQuestionRepository = quizQuestionRepository;
+            _xpService = xpService;
             _logger = logger;
         }
 
@@ -106,6 +110,15 @@ namespace NexiumCode.Controllers
                     bool isCorrect = request.Answer?.Equals(question.CorrectAnswer, StringComparison.OrdinalIgnoreCase) ?? false;
                     _logger.LogInformation($"Answer check: submitted={request.Answer}, correct={question.CorrectAnswer}, isCorrect={isCorrect}");
 
+                    if (isCorrect)
+                    {
+                        await _xpService.AddXP(request.UserId, 20, "quiz", "Correct quiz answer");
+                        await _xpService.AddELO(request.UserId, 8, "Correct quiz answer");
+                        await _xpService.UpdateStreak(request.UserId);
+
+                        await _xpService.UpdateSkillProgress(request.UserId, "quiz", 10);
+                    }
+
                     return Ok(new
                     {
                         IsCorrect = isCorrect,
@@ -121,6 +134,14 @@ namespace NexiumCode.Controllers
                 }
 
                 bool isCorrectDb = request.Answer == dbQuestion.CorrectAnswer;
+
+                if (isCorrectDb)
+                {
+                    await _xpService.AddXP(request.UserId, 20, "quiz", "Correct quiz answer");
+                    await _xpService.AddELO(request.UserId, 8, "Correct quiz answer");
+                    await _xpService.UpdateStreak(request.UserId);
+                }
+
                 return Ok(new { IsCorrect = isCorrectDb, CorrectAnswer = isCorrectDb ? null : dbQuestion.CorrectAnswer });
             }
             catch (JsonException ex)

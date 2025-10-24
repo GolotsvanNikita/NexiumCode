@@ -12,20 +12,39 @@ interface Certificate
     issueDate: string;
 }
 
+interface SkillTree
+{
+    theoryMaster: number;
+    theoryMasterRank: number;
+    practicePro: number;
+    practiceProRank: number;
+    quizChampion: number;
+    quizChampionRank: number;
+    communityStar: number;
+    communityStarRank: number;
+}
+
 interface UserProfile
 {
     id: number;
     username: string;
     email: string;
     rating: number;
+    level: number;
+    currentXP: number;
+    xpToNextLevel: number;
+    totalXP: number;
     avatarUrl: string;
     certificates: Certificate[];
+    skillTree: SkillTree;
+    streak: number;
+    achievements: string[];
 }
 
 interface ProfileProps
 {
     userId: number | null;
-    onAvatarUpdate?: (avatarUrl: string) => void; // Добавляем callback
+    onAvatarUpdate?: (avatarUrl: string) => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({ userId, onAvatarUpdate }) =>
@@ -42,8 +61,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId, onAvatarUpdate }) =>
     {
         const fetchProfile = async () =>
         {
-            try
-            {
+            try {
                 setLoading(true);
                 const id = profileUserId || userId;
                 const response = await axios.get(`http://localhost:5064/api/User/profile/${id}`);
@@ -89,9 +107,7 @@ export const Profile: React.FC<ProfileProps> = ({ userId, onAvatarUpdate }) =>
             const response = await axios.post(
                 `http://localhost:5064/api/User/upload-avatar?userId=${userId}`,
                 formData,
-                {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                }
+                { headers: { 'Content-Type': 'multipart/form-data' } }
             );
 
             if (profile)
@@ -115,32 +131,60 @@ export const Profile: React.FC<ProfileProps> = ({ userId, onAvatarUpdate }) =>
         }
     };
 
+    const getRankName = (elo: number) =>
+    {
+        if (elo < 300) return { name: 'Beginner', color: '#8B7355' };
+        if (elo < 500) return { name: 'Student', color: '#4A90E2' };
+        if (elo < 800) return { name: 'Developer', color: '#50C878' };
+        if (elo < 1000) return { name: 'Professional', color: '#9B59B6' };
+        if (elo < 2000) return { name: 'Expert', color: '#E67E22' };
+        return { name: 'Master', color: '#FFD700' };
+    };
+
+    const getSkillColor = (value: number) =>
+    {
+        if (value < 25) return '#e74c3c';
+        if (value < 50) return '#f39c12';
+        if (value < 75) return '#3498db';
+        return '#2ecc71';
+    };
+
     if (loading)
     {
         return (
             <div className="profile-container">
                 <div className="profile-card">
                     <div className="profile-header">
-                        <div className="skeleton skeleton-avatar-large" style={{width: '120px', height: '120px', borderRadius: '50%', margin: '0 auto 20px'}}></div>
-                        <div className="skeleton" style={{width: '200px', height: '32px', margin: '0 auto 10px'}}></div>
-                        <div className="skeleton" style={{width: '250px', height: '18px', margin: '0 auto'}}></div>
+                        <div className="skeleton skeleton-avatar-large"></div>
+                        <div className="skeleton skeleton-title"></div>
+                        <div className="skeleton skeleton-email"></div>
                     </div>
                     <div className="profile-stats">
                         <div className="stat-item">
-                            <div className="skeleton" style={{width: '80px', height: '20px', margin: '0 auto 10px'}}></div>
-                            <div className="skeleton" style={{width: '60px', height: '40px', margin: '0 auto'}}></div>
+                            <div className="skeleton skeleton-stat"></div>
                         </div>
                         <div className="stat-item">
-                            <div className="skeleton" style={{width: '100px', height: '20px', margin: '0 auto 10px'}}></div>
-                            <div className="skeleton" style={{width: '60px', height: '40px', margin: '0 auto'}}></div>
+                            <div className="skeleton skeleton-stat"></div>
                         </div>
                     </div>
                 </div>
             </div>
         );
     }
+
     if (error) return <div className="error">{error}</div>;
     if (!profile) return <div className="error">Profile not found</div>;
+
+    const rank = getRankName(profile.rating);
+    const xpProgress = (profile.currentXP / profile.xpToNextLevel) * 100;
+
+    const skillIcons =
+    {
+        theoryMaster: 'http://localhost:5064/images/brain.png',
+        practicePro: 'http://localhost:5064/images/arm.png',
+        quizChampion: 'http://localhost:5064/images/darts.png',
+        communityStar: 'http://localhost:5064/images/message.png',
+    };
 
     return (
         <div className="profile-container">
@@ -161,28 +205,162 @@ export const Profile: React.FC<ProfileProps> = ({ userId, onAvatarUpdate }) =>
                                     disabled={uploading}
                                     style={{ display: 'none' }}
                                 />
-                                <img src='http://localhost:5064/images/Download.png' className='download' alt="download"/>
+                                <img src='http://localhost:5064/images/Download.png' className='download' alt="upload" />
                             </label>
                         )}
                     </div>
                     <h1>{profile.username}</h1>
                     <p className="profile-email">{profile.email}</p>
+
+                    {profile.streak > 0 && (
+                        <div className="streak-badge">
+                            <img src="http://localhost:5064/images/streak-icon.png" alt="Streak" className="streak-icon" />
+                            {profile.streak} day streak
+                        </div>
+                    )}
                 </div>
 
-                <div className="profile-stats">
-                    <div className="stat-item">
-                        <div className="stat-label">Rating</div>
-                        <div className="stat-value">{profile.rating}</div>
+                <div className="profile-main-stats">
+                    <div className="elo-card">
+                        <div className="elo-label">ELO</div>
+                        <div className="elo-value" style={{ color: rank.color }}>
+                            {profile.rating}
+                        </div>
+                        <div className="rank-badge" style={{ background: rank.color }}>
+                            {rank.name}
+                        </div>
                     </div>
-                    <div className="stat-item">
-                        <div className="stat-label">Certificates</div>
-                        <div className="stat-value">{profile.certificates?.length || 0}</div>
+
+                    <div className="level-card">
+                        <div className="level-header">
+                            <span className="level-label">Level {profile.level}</span>
+                            <span className="level-xp">{profile.currentXP} / {profile.xpToNextLevel} XP</span>
+                        </div>
+                        <div className="xp-bar">
+                            <div className="xp-fill" style={{ width: `${xpProgress}%` }}></div>
+                        </div>
                     </div>
                 </div>
+
+                <div className="skill-tree-section">
+                    <h2>
+                        <img src="http://localhost:5064/images/tree.png" alt="Skill Tree" className="section-icon" />
+                        Skill Tree
+                    </h2>
+                    <div className="skill-tree">
+                        <div className="skill-branch">
+                            <img src={skillIcons.theoryMaster} alt="Theory Master" className="skill-icon" />
+                            <div className="skill-info">
+                                <div className="skill-name">
+                                    Theory
+                                    {profile.skillTree.theoryMasterRank > 0 && (
+                                        <span className="skill-rank"> ★{profile.skillTree.theoryMasterRank}</span>
+                                    )}
+                                </div>
+                                <div className="skill-bar">
+                                    <div
+                                        className="skill-fill"
+                                        style={{
+                                            width: `${profile.skillTree.theoryMaster}%`,
+                                            background: getSkillColor(profile.skillTree.theoryMaster),
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="skill-value">{profile.skillTree.theoryMaster}%</div>
+                            </div>
+                        </div>
+
+                        <div className="skill-branch">
+                            <img src={skillIcons.practicePro} alt="Practice Pro" className="skill-icon" />
+                            <div className="skill-info">
+                                <div className="skill-name">
+                                    Practice
+                                    {profile.skillTree.practiceProRank > 0 && (
+                                        <span className="skill-rank"> ★{profile.skillTree.practiceProRank}</span>
+                                    )}
+                                </div>
+                                <div className="skill-bar">
+                                    <div
+                                        className="skill-fill"
+                                        style={{
+                                            width: `${profile.skillTree.practicePro}%`,
+                                            background: getSkillColor(profile.skillTree.practicePro),
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="skill-value">{profile.skillTree.practicePro}%</div>
+                            </div>
+                        </div>
+
+                        <div className="skill-branch">
+                            <img src={skillIcons.quizChampion} alt="Quiz Champion" className="skill-icon" />
+                            <div className="skill-info">
+                                <div className="skill-name">
+                                    Quiz
+                                    {profile.skillTree.quizChampionRank > 0 && (
+                                        <span className="skill-rank"> ★{profile.skillTree.quizChampionRank}</span>
+                                    )}
+                                </div>
+                                <div className="skill-bar">
+                                    <div
+                                        className="skill-fill"
+                                        style={{
+                                            width: `${profile.skillTree.quizChampion}%`,
+                                            background: getSkillColor(profile.skillTree.quizChampion),
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="skill-value">{profile.skillTree.quizChampion}%</div>
+                            </div>
+                        </div>
+
+                        <div className="skill-branch">
+                            <img src={skillIcons.communityStar} alt="Community Star" className="skill-icon" />
+                            <div className="skill-info">
+                                <div className="skill-name">
+                                    Community
+                                    {profile.skillTree.communityStarRank > 0 && (
+                                        <span className="skill-rank"> ★{profile.skillTree.communityStarRank}</span>
+                                    )}
+                                </div>
+                                <div className="skill-bar">
+                                    <div
+                                        className="skill-fill"
+                                        style={{
+                                            width: `${profile.skillTree.communityStar}%`,
+                                            background: getSkillColor(profile.skillTree.communityStar),
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="skill-value">{profile.skillTree.communityStar}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {profile.achievements && profile.achievements.length > 0 && (
+                    <div className="achievements-section">
+                        <h2>
+                            <img src="http://localhost:5064/images/achievements.png" alt="Achievements" className="section-icon" />
+                            Achievements
+                        </h2>
+                        <div className="achievements-grid">
+                            {profile.achievements.map((achievement, index) => (
+                                <div key={index} className="achievement-badge">
+                                    <img src="http://localhost:5064/images/badge.png" alt={achievement} className="achievement-icon" />
+                                    {achievement}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {profile.certificates && profile.certificates.length > 0 && (
                     <div className="certificates-section">
-                        <h2>Certificates</h2>
+                        <h2>
+                            <img src="http://localhost:5064/images/certificates-icon.png" alt="Certificates" className="section-icon" />
+                            Certificates
+                        </h2>
                         <div className="certificates-list">
                             {profile.certificates.map((cert) => (
                                 <div key={cert.id} className="certificate-card">

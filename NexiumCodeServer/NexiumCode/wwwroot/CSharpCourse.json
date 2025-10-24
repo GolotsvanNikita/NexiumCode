@@ -37,6 +37,16 @@
           "correctAnswer": "B",
           "explanation": ".NET is Microsoft's framework for building applications with C#."
         }
+      ],
+      "practiceTasks": [
+        {
+          "id": 1,
+          "taskDescription": "Write a C# program that prints 'Hello, C#!' followed by the current year to the console.",
+          "starterCode": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // Write your code here\n    }\n}",
+          "testCases": "Console.WriteLine(\"Hello, C#!\");\nConsole.WriteLine(DateTime.Now.Year);",
+          "averageTimeSeconds": 300,
+          "expectedOutput": "Hello, C#!\n2025"
+        }
       ]
     },
     {
@@ -76,6 +86,16 @@
           "options": "A) #\nB) @\nC) $\nD) %",
           "correctAnswer": "C",
           "explanation": "The $ symbol before a string enables interpolation, allowing you to embed expressions like $\"{name}\"."
+        }
+      ],
+      "practiceTasks": [
+        {
+          "id": 2,
+          "taskDescription": "Create a program that declares variables for name (string), age (int), and height (double), then prints them in a sentence.",
+          "starterCode": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // Declare variables here\n        // Print: \"Name is X years old and Y meters tall.\"\n    }\n}",
+          "testCases": "string name = \"Alice\"; int age = 25; double height = 1.7;\nConsole.WriteLine($\"{name} is {age} years old and {height} meters tall.\");",
+          "averageTimeSeconds": 480,
+          "expectedOutput": "Alice is 25 years old and 1.7 meters tall."
         }
       ]
     },

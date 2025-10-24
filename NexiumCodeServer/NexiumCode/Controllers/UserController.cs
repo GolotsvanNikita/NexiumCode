@@ -6,6 +6,7 @@ using NexiumCode.Models;
 using NexiumCode.Repositories;
 using NexiumCode.Services;
 using System.Linq;
+using System.Text.Json;
 
 namespace NexiumCode.Controllers
 {
@@ -145,13 +146,50 @@ namespace NexiumCode.Controllers
 
                 var certificates = await _certificateRepository.GetCertificatesByUser(userId);
 
+                List<string> achievements;
+                if (string.IsNullOrWhiteSpace(user.Achievements))
+                {
+                    achievements = [];
+                }
+                else
+                {
+                    try
+                    {
+                        achievements = JsonSerializer.Deserialize<List<string>>(user.Achievements) ?? [];
+                    }
+                    catch (JsonException)
+                    {
+                        achievements = [];
+                        _logger.LogWarning("Failed to deserialize achievements for user {UserId}, returning empty list", userId);
+                    }
+                }
+
+                int xpForNextLevel = (int)(100 * user.Level * 1.15);
+
                 return Ok(new
                 {
                     Id = user.Id,
                     Username = user.Username,
                     Email = user.Email,
                     Rating = user.Rating,
+                    Level = user.Level,
+                    CurrentXP = user.CurrentXP,
+                    XPToNextLevel = xpForNextLevel,
+                    TotalXP = user.TotalXP,
                     AvatarUrl = user.AvatarUrl,
+                    Streak = user.CurrentStreak,
+                    SkillTree = new
+                    {
+                        TheoryMaster = user.TheoryMasterProgress,
+                        TheoryMasterRank = user.TheoryMasterRank,
+                        PracticePro = user.PracticeProProgress,
+                        PracticeProRank = user.PracticeProRank,
+                        QuizChampion = user.QuizChampionProgress,
+                        QuizChampionRank = user.QuizChampionRank,
+                        CommunityStar = user.CommunityStarProgress,
+                        CommunityStarRank = user.CommunityStarRank
+                    },
+                    Achievements = achievements,
                     Certificates = certificates.Select(c => new
                     {
                         c.Id,
