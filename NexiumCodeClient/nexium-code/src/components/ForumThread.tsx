@@ -1,57 +1,139 @@
 import React, { useState, useEffect } from "react";
 import "./ForumThread.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import javascript from "react-syntax-highlighter/dist/esm/languages/prism/javascript";
+import csharp from "react-syntax-highlighter/dist/esm/languages/prism/csharp";
+import python from "react-syntax-highlighter/dist/esm/languages/prism/python";
+import markup from "react-syntax-highlighter/dist/esm/languages/prism/markup"; 
 import { forumService, type Thread, type Reply } from "../services/forumService";
+import photoIcon from "/photo.png";
 
-interface ForumThreadProps
-{
+SyntaxHighlighter.registerLanguage('javascript', javascript);
+SyntaxHighlighter.registerLanguage('csharp', csharp);
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('html', markup);
+SyntaxHighlighter.registerLanguage('css', markup);
+
+interface ForumThreadProps {
     userId: number | null;
 }
 
-interface CommentItemProps
-{
+interface CommentItemProps {
     comment: Reply;
     onReply: (parentId: number, text: string) => void;
     formatDate: (date: string) => string;
     userId: number | null;
 }
 
-const parseCommentText = (text: string) =>
-{
-    const parts = text.split(/```/);
-    return parts.map((part, index) =>
-    {
-        if (index % 2 === 1)
-        {
-            const lines = part.trim().split("\n");
-            let language = "javascript";
-            if (lines[0].match(/^[a-z]+$/i))
-            {
-                language = lines[0];
-                lines.shift();
+const parseCommentText = (text: string) => {
+    if (!text) return null;
+    
+
+    const cleanedText = text
+        .replace(/\u00A0/g, ' ') 
+        .replace(/\r/g, '');
+    const regex = /(```(\w*)\n([\s\S]*?)\n```)|(!\[.*?\]\((.*?)\))|([\s\S]+?)(?=```|!\[.*?\]\(.*?\)|$)/gs;
+
+    const parts = Array.from(cleanedText.matchAll(regex)); 
+
+    return parts.map((match, index) => {
+        const [
+            fullMatch, 
+            codeBlock, 
+            lang, 
+            codeContent, 
+            imageBlock, 
+            imageUrl, 
+            textContent
+        ] = match;
+
+        if (codeBlock) {
+            let language = lang?.toLowerCase();
+            const supportedLangs = ['javascript', 'csharp', 'python', 'markup']; 
+            if (!language || !supportedLangs.includes(language)) {
+                language = 'text'; 
             }
+            
             return (
                 <SyntaxHighlighter
                     key={index}
-                    language={language}
+                    language={language === 'c#' ? 'csharp' : language} 
                     style={vscDarkPlus}
+                    PreTag="div"
+                    wrapLongLines={true}
                     customStyle={{
-                        borderRadius: "8px",
-                        fontSize: "14px",
+                        borderRadius: "10px",
                         background: "#1e1e1e",
+                        padding: "14px",
+                        fontSize: "14px",
+                        lineHeight: "1.5",
+                        margin: "10px 0",
                     }}
                 >
-                    {lines.join("\n")}
+                    {codeContent.trimEnd()}
                 </SyntaxHighlighter>
             );
         }
-        return <span key={index}>{part}</span>;
-    });
+
+        if (imageBlock) {
+            const imageMatch = /!\[(.*?)\]\((.*?)\)/.exec(imageBlock);
+            if (imageMatch) {
+                const [, alt, url] = imageMatch;
+                return (
+                    <img
+                        key={index}
+                        src={url}
+                        alt={alt || "image"}
+                        style={{
+                            maxWidth: "100%",
+                            borderRadius: "8px",
+                            margin: "10px 0",
+                            display: "block",
+                        }}
+                    />
+                );
+            }
+        }
+
+        if (textContent) {
+
+            const withImages = textContent.split(/(!\[.*?\]\((.*?)\))/g).map((segment, i) => {
+                const match = /!\[(.*?)\]\((.*?)\)/.exec(segment);
+                if (match) {
+                    const [, alt, url] = match;
+                    return (
+                        <img
+                            key={`text-img-${i}`}
+                            src={url}
+                            alt={alt || "image"}
+                            style={{
+                                maxWidth: "100%",
+                                borderRadius: "8px",
+                                margin: "10px 0",
+                                display: "block",
+                            }}
+                        />
+                    );
+                }
+                return <span key={`text-span-${i}`}>{segment}</span>;
+            });
+
+            return (
+                <p key={index} style={{ whiteSpace: "pre-wrap", margin: "6px 0" }}>
+                    {withImages}
+                </p>
+            );
+        }
+
+        return null;
+    }).filter(Boolean);
 };
 
+
 const ThreadContentSkeleton = () => (
+
     <div className="thread-container">
         <div className="skeleton skeleton-back-btn" style={{width: '100px', height: '32px', marginBottom: '20px'}}></div>
 
@@ -116,6 +198,7 @@ export const ForumThread: React.FC<ForumThreadProps> = ({ userId }) =>
             setLoading(true);
             setError(null);
             const data = await forumService.getThread(parseInt(id));
+            console.log("Содержимое темы (Thread Content):", data.content);
             setThread(data);
         }
         catch (err)
@@ -333,12 +416,36 @@ export const ForumThread: React.FC<ForumThreadProps> = ({ userId }) =>
 
             <div className="new-comment">
                 <div className="input-wrapper">
+                    <div className="comment-actions">
+                    </div>
+                                     <button className="button-image"
+                            onClick={() => document.getElementById("replyImageInput")?.click()}
+                            disabled={submitting}
+                        >
+                            <img className="photoIcon"src={photoIcon}/>
+                        </button>
+                        <input
+                            type="file"
+                            id="replyImageInput"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                try {
+                                    const url = await forumService.uploadImage(file);
+                                    setNewComment((p) => p + `\n![](${url})\n`);
+                                } catch {
+                                    alert("Image upload failed");
+                                }
+                            }}
+                        />
           <textarea
-              placeholder='Write a comment... (use ``` for code blocks)'
+              placeholder='Write a comment... (use ```lang\ncode\n``` for code blocks)' 
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className="comment-textarea"
-              disabled={submitting}
+              disabled={submitting}         
           ></textarea>
                     <div className="comment-actions">
                         <button
@@ -356,11 +463,11 @@ export const ForumThread: React.FC<ForumThreadProps> = ({ userId }) =>
 };
 
 const CommentItem: React.FC<CommentItemProps> = ({
-                                                     comment,
-                                                     onReply,
-                                                     formatDate,
-                                                     userId,
-                                                 }) => {
+    comment,
+    onReply,
+    formatDate,
+     userId,
+     }) => {
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
     const navigate = useNavigate();

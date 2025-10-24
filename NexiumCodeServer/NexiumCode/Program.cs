@@ -64,5 +64,6 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseSession();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();

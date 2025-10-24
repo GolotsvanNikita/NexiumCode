@@ -139,6 +139,81 @@
   transform: none;
 }
 
+.photoIcon{
+  height: 25px;
+  width: 25px;
+}
+
+.editor-live-container {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  margin-top: 14px;
+  border: 1px solid #e3dfd7;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
+.editor-preview {
+  position: relative;
+  background: #1e1e1e;
+  color: #fff;
+  font-family: monospace;
+  padding: 16px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 300px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.editor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: transparent;
+  caret-color: white;
+  border: none;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.5;
+  font-family: monospace;
+  z-index: 2;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.editor-live-container:focus-within {
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.1);
+}
+
+.code-editor-wrapper {
+  margin-top: 14px;
+  position: relative;
+}
+
+.exit-code-mode {
+  margin-top: 10px;
+  background: #111;
+  color: #f5f2ec;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.exit-code-mode:hover {
+  background: #2a2a2a;
+}
+
+
+
 @media (max-width: 768px) {
   .create-topic-container {
     padding: 16px;
